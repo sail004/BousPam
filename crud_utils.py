@@ -167,3 +167,37 @@ def get_route_by_name(db: Session, route_name: str):
 
 def login_user(db: Session, phone_number: str, password: str):
     return db.query(models.User).filter(models.User.phone_number == phone_number, models.User.password == password).first()
+
+
+def create_transport_company(db: Session, company: schemas.TransportCompanyCreate):
+    db_company = models.TransportCompany(
+        name=company.name,
+        routes=company.routes,
+        terminals=company.terminals
+    )
+    db.add(db_company)
+    db.commit()
+    db.refresh(db_company)
+    return db_company
+
+
+def get_transport_company_by_id(db: Session, tc_id: int) -> object:
+    return db.query(models.TransportCompany).filter(models.TransportCompany.id == tc_id).first()
+
+
+def update_transport_company(db: Session, company: schemas.TransportCompanyUpdate, tc_id: int):
+    db_company = get_transport_company_by_id(db, tc_id=tc_id)
+    company_data = company.dict()
+
+    for key, value in company_data.items():
+        setattr(db_company, key, value)
+    db.add(db_company)
+    db.commit()
+    return db_company
+
+
+def delete_transport_company(db: Session, tc_id: int):
+    db_company = get_transport_company_by_id(db, tc_id=tc_id)
+
+    db.delete(db_company)
+    db.commit()

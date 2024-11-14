@@ -217,3 +217,29 @@ def read_route_by_route_name(route_name: str, db: Session = Depends(get_db)):
     if db_route is None:
         raise HTTPException(status_code=404, detail=f"Route with name=\'{route_name}\' not found")
     return db_route
+
+
+@app.post("/tc/") #, response_model=schemas.ProductCreate
+def create_transport_company(tc: schemas.TransportCompanyCreate, db: Session = Depends(get_db)):
+    return crud_utils.create_transport_company(db=db, company=tc).id
+
+
+@app.put("/tc/{tc_id}") #, response_model=schemas.Product
+def update_transport_company_by_id(tc_id: int, tc: schemas.TransportCompanyUpdate, db: Session = Depends(get_db)):
+    db_company = crud_utils.get_transport_company_by_id(db, tc_id=tc_id)
+    if db_company is None:
+        raise HTTPException(status_code=404, detail=f"Company with id=\'{tc_id}\' not found")
+    return crud_utils.update_transport_company(db, company=tc, tc_id=tc_id)
+
+
+@app.delete("/tc/{tc_id}") #, response_model=dict
+def delete_transport_company_by_id(tc_id: int, db: Session = Depends(get_db)):
+    db_company = crud_utils.get_transport_company_by_id(db, tc_id=tc_id)
+    if db_company is None:
+        raise HTTPException(status_code=404, detail=f"Company with id=\'{tc_id}\' not found")
+    crud_utils.delete_transport_company(db, tc_id=tc_id)
+
+    return {
+        "status": "ok",
+        "message": "Deletion was successful"
+    }
