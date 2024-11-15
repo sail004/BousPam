@@ -30,6 +30,7 @@ class User(UserBase):
 
 class OperationBase(BaseModel):
     id_terminal: int
+    type: str
     balance_change: float
     id_user: int
 

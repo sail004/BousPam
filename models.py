@@ -23,6 +23,7 @@ class Operation(Base):
     id_operation = Column(Integer, primary_key=True)
     id_terminal = Column(Integer)
     id_user = Column(Integer)
+    type = Column(String)
     balance_change = Column(Float)
     datetime = Column(DateTime)
 

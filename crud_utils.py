@@ -41,6 +41,7 @@ def create_user(db: Session, user: schemas.UserCreate):
 
 def create_operation(db: Session, operation: schemas.OperationCreate):
     db_operation = models.Operation(
+        type=operation.type,
         id_terminal=operation.id_terminal,
         id_user=operation.id_user,
         balance_change=operation.balance_change,
