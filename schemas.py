@@ -30,13 +30,13 @@ class User(UserBase):
 
 class OperationBase(BaseModel):
     id_terminal: int
-    type: str
     balance_change: float
     id_user: int
 
 
 class Operation(OperationBase):
     id_operation: int
+    type: str
     datetime: datetime
 
 

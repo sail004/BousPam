@@ -39,9 +39,9 @@ def create_user(db: Session, user: schemas.UserCreate):
     return db_user
 
 
-def create_operation(db: Session, operation: schemas.OperationCreate):
+def create_operation(db: Session, operation: schemas.OperationCreate, op_type: str):
     db_operation = models.Operation(
-        type=operation.type,
+        type=op_type,
         id_terminal=operation.id_terminal,
         id_user=operation.id_user,
         balance_change=operation.balance_change,

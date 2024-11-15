@@ -116,14 +116,26 @@ def update_user_by_id(user_id: int, user: schemas.UserUpdate, db: Session = Depe
 
 
 @app.put("/balance/{user_id}") #, response_model=schemas.Product
-def update_balance_by_user_id(operation: schemas.OperationCreate, db: Session = Depends(get_db)):
+def payment_by_user_id(operation: schemas.OperationCreate, db: Session = Depends(get_db)):
     db_user = crud_utils.get_user_by_id(db, user_id=operation.id_user)
     db_terminal = crud_utils.get_terminal_by_id(db, terminal_id=operation.id_terminal)
     if db_terminal is None:
         raise HTTPException(status_code=404, detail=f"Terminal with id=\'{operation.id_terminal}\' not found")
     if db_user is None:
         raise HTTPException(status_code=404, detail=f"User with id=\'{operation.id_user}\' not found")
-    create_operation(db, operation)
+    create_operation(db, operation, 'payment')
+    return crud_utils.update_balance(db, user_id=operation.id_user, balance=-operation.balance_change)
+
+
+@app.put("/balance/{user_id}") #, response_model=schemas.Product
+def replenishment_by_user_id(operation: schemas.OperationCreate, db: Session = Depends(get_db)):
+    db_user = crud_utils.get_user_by_id(db, user_id=operation.id_user)
+    db_terminal = crud_utils.get_terminal_by_id(db, terminal_id=operation.id_terminal)
+    if db_terminal is None:
+        raise HTTPException(status_code=404, detail=f"Terminal with id=\'{operation.id_terminal}\' not found")
+    if db_user is None:
+        raise HTTPException(status_code=404, detail=f"User with id=\'{operation.id_user}\' not found")
+    create_operation(db, operation, 'replenishment')
     return crud_utils.update_balance(db, user_id=operation.id_user, balance=operation.balance_change)
 
 

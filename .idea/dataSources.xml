@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="product_db" uuid="d5306e70-bd7e-461d-a69b-875e46dc7b7d">
+    <data-source source="LOCAL" name="product_db [2]" uuid="ca1db127-e0f0-473f-bc17-5314046a1b8e">
       <driver-ref>sqlite.xerial</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
-      <jdbc-url>jdbc:sqlite:D:\Projects\Bous_Pam_backend\product_db.db</jdbc-url>
+      <jdbc-url>jdbc:sqlite:D:\Учёба\Проектный практикум\Bous Pam\BousPam\product_db.db</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
       <libraries>
         <library>
