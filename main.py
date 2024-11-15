@@ -115,7 +115,7 @@ def update_user_by_id(user_id: int, user: schemas.UserUpdate, db: Session = Depe
     return crud_utils.update_user(db, user=user, user_id=user_id)
 
 
-@app.put("/balance/{user_id}") #, response_model=schemas.Product
+@app.put("/payment/{user_id}") #, response_model=schemas.Product
 def payment_by_user_id(operation: schemas.OperationCreate, db: Session = Depends(get_db)):
     db_user = crud_utils.get_user_by_id(db, user_id=operation.id_user)
     db_terminal = crud_utils.get_terminal_by_id(db, terminal_id=operation.id_terminal)
@@ -127,7 +127,7 @@ def payment_by_user_id(operation: schemas.OperationCreate, db: Session = Depends
     return crud_utils.update_balance(db, user_id=operation.id_user, balance=-operation.balance_change)
 
 
-@app.put("/balance/{user_id}") #, response_model=schemas.Product
+@app.put("/replenishment/{user_id}") #, response_model=schemas.Product
 def replenishment_by_user_id(operation: schemas.OperationCreate, db: Session = Depends(get_db)):
     db_user = crud_utils.get_user_by_id(db, user_id=operation.id_user)
     db_terminal = crud_utils.get_terminal_by_id(db, terminal_id=operation.id_terminal)
