@@ -29,7 +29,6 @@ class User(UserBase):
 
 
 class OperationBase(BaseModel):
-    id_terminal: int
     balance_change: float
     id_user: int
 
@@ -40,8 +39,12 @@ class Operation(OperationBase):
     datetime: datetime
 
 
-class OperationCreate(OperationBase):
-    pass
+class OperationPaymentCreate(OperationBase):
+    id_terminal: int
+
+
+class OperationReplenishmentCreate(OperationBase):
+    bank_name: str
 
 
 class OperationUpdate(OperationBase):

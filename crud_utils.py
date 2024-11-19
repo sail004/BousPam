@@ -39,10 +39,23 @@ def create_user(db: Session, user: schemas.UserCreate):
     return db_user
 
 
-def create_operation(db: Session, operation: schemas.OperationCreate, op_type: str):
+def create_operation_payment(db: Session, operation: schemas.OperationPaymentCreate, op_type: str):
     db_operation = models.Operation(
         type=op_type,
         id_terminal=operation.id_terminal,
+        id_user=operation.id_user,
+        balance_change=operation.balance_change,
+        datetime=datetime.now())
+    db.add(db_operation)
+    db.commit()
+    db.refresh(db_operation)
+    return db_operation
+
+
+def create_operation_replenishment(db: Session, operation: schemas.OperationReplenishmentCreate, op_type: str):
+    db_operation = models.Operation(
+        type=op_type,
+        bank_name=operation.bank_name,
         id_user=operation.id_user,
         balance_change=operation.balance_change,
         datetime=datetime.now())
