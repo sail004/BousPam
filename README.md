@@ -1,4 +1,11 @@
 <h1 align="center">Серверная часть проекта Bous Pam</h1>
+## Запуск проекта:
+
+1. Клонировать репозиторий: `git clone https://github.com/sail004/BousPam`
+
+2. Установить uvicorn: `pip install fastapi uvicorn`
+
+3. Запустить приложение: `uvicorn main:app --reload`
 
 ## База данных:
 
