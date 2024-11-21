@@ -4,9 +4,11 @@
 
 1. Клонировать репозиторий: `git clone https://github.com/sail004/BousPam`
 
-2. Установить uvicorn: `pip install fastapi uvicorn`
+2. Установить все необходимые библиотеки и фреймворки.
 
-3. Запустить приложение: `uvicorn main:app --reload`
+3. Установить uvicorn: `pip install fastapi uvicorn`
+
+4. Запустить приложение: `uvicorn main:app --reload`
 
 ## База данных:
 
