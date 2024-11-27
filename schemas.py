@@ -25,6 +25,8 @@ class UserUpdate(UserBase):
 
 class User(UserBase):
     id: int
+    salt: bytes
+    key: bytes
     balance: float
 
 

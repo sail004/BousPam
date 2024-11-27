@@ -8,6 +8,7 @@ import os
 import crud_utils
 import models
 import schemas
+
 from database import SessionLocal, engine
 import asyncio
 from fastapi.templating import Jinja2Templates
@@ -43,8 +44,6 @@ def register_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     user_exists = crud_utils.get_user_by_phone_number(db, phone_number=user.phone_number)
     if user_exists:
         return 'The number has already been registered'
-    if user.password != user.password2:
-        return 'Passwords don\'t match'
     return crud_utils.create_user(db=db, user=user).id
 
 
@@ -57,8 +56,10 @@ def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
 @app.get("/login/") #, response_model=List[schemas.Product]
 def login_user(phone_number: str, password: str, db: Session = Depends(get_db)):
     db_user = crud_utils.login_user(db, phone_number=phone_number, password=password)
-    if db_user is None:
-        return 'Incorrect phone number or password'
+    if db_user == 'numb':
+        return 'Incorrect phone number'
+    if not db_user:
+        return 'Incorrect password'
     return db_user
 
 

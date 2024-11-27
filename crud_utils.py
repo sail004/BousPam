@@ -2,6 +2,8 @@ from datetime import datetime
 
 from sqlalchemy.orm import Session
 import models
+import hashlib
+import os
 import schemas
 from fastapi import HTTPException
 # from . import models, schemas
@@ -26,11 +28,14 @@ def get_users(db: Session, skip: int = 0, limit: int = 100):
 
 
 def create_user(db: Session, user: schemas.UserCreate):
+    salt = os.urandom(32)
+    key = hashlib.pbkdf2_hmac('sha256', user.password.encode('utf-8'), salt, 100000, dklen=128)
     db_user = models.User(
         name=user.name,
         surname=user.surname,
         balance=0.0,
-        password=user.password,
+        salt=salt,
+        key=key,
         phone_number=user.phone_number,
         )
     db.add(db_user)
@@ -180,7 +185,20 @@ def get_route_by_name(db: Session, route_name: str):
 
 
 def login_user(db: Session, phone_number: str, password: str):
-    return db.query(models.User).filter(models.User.phone_number == phone_number, models.User.password == password).first()
+    user = db.query(models.User).filter(models.User.phone_number == phone_number).first()
+    if user is None:
+        return 'numb'
+    salt = user.salt
+    key = user.key
+    new_key = hashlib.pbkdf2_hmac(
+        'sha256',
+        password.encode('utf-8'),
+        salt,
+        100000)
+    if new_key == key:
+        return user
+    else:
+        return False
 
 
 def create_transport_company(db: Session, company: schemas.TransportCompanyCreate):

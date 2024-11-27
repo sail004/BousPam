@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, String, Float, DateTime, ARRAY
+from sqlalchemy import Column, Integer, String, Float, DateTime
+from sqlalchemy.dialects.mysql.types import BIT
 import schemas
 from database import Base
 
@@ -8,7 +9,8 @@ class User(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String)
-    password = Column(String)
+    key = Column(String)
+    salt = Column(String)
     surname = Column(String)
     phone_number = Column(String)
     balance = Column(Float)
