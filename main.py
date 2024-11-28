@@ -58,7 +58,7 @@ def login_user(phone_number: str, password: str, db: Session = Depends(get_db)):
     db_user = crud_utils.login_user(db, phone_number=phone_number, password=password)
     if db_user == 'numb':
         return 'Incorrect phone number'
-    if not db_user:
+    if db_user == 'inc':
         return 'Incorrect password'
     return db_user
 

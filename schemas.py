@@ -13,7 +13,7 @@ class UserBase(BaseModel):
 
 
 class UserCreate(UserBase):
-    password2: str
+    pass
 
 
 class UserUpdate(UserBase):
@@ -25,8 +25,8 @@ class UserUpdate(UserBase):
 
 class User(UserBase):
     id: int
-    salt: bytes
-    key: bytes
+    salt: str
+    key: str
     balance: float
 
 

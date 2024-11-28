@@ -1,5 +1,5 @@
 from datetime import datetime
-
+from base64 import b64encode, b64decode
 from sqlalchemy.orm import Session
 import models
 import hashlib
@@ -34,8 +34,8 @@ def create_user(db: Session, user: schemas.UserCreate):
         name=user.name,
         surname=user.surname,
         balance=0.0,
-        salt=salt,
-        key=key,
+        salt=salt.hex(),
+        key=key.hex(),
         phone_number=user.phone_number,
         )
     db.add(db_user)
@@ -188,17 +188,17 @@ def login_user(db: Session, phone_number: str, password: str):
     user = db.query(models.User).filter(models.User.phone_number == phone_number).first()
     if user is None:
         return 'numb'
-    salt = user.salt
-    key = user.key
+    salt = bytes.fromhex(user.salt)
+    key = bytes.fromhex(user.key)
     new_key = hashlib.pbkdf2_hmac(
         'sha256',
         password.encode('utf-8'),
         salt,
-        100000)
+        100000,
+        dklen=128)
     if new_key == key:
         return user
-    else:
-        return False
+    return 'inc'
 
 
 def create_transport_company(db: Session, company: schemas.TransportCompanyCreate):
