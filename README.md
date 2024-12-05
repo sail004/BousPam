@@ -6,9 +6,7 @@
 
 2. Установить все необходимые библиотеки и фреймворки: `pip install -r requirements.txt`
 
-3. Установить uvicorn: `pip install fastapi uvicorn`
-
-4. Запустить приложение: `uvicorn main:app --reload`
+3. Запустить приложение: `uvicorn main:app --reload`
 
 ## База данных:
 
