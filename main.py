@@ -1,29 +1,23 @@
-from datetime import datetime
-
-import requests
 from fastapi import Depends, FastAPI, HTTPException, Response, Request
 from sqlalchemy.orm import Session
-from typing import List
 import os
 import crud_utils
 import models
 import schemas
-
 from database import SessionLocal, engine
-import asyncio
-from fastapi.templating import Jinja2Templates
-from fastapi.responses import HTMLResponse
-from fastapi.staticfiles import StaticFiles
-
-headers = {
-    'accept': 'application/json',
-    'Content-Type': 'application/json',
-}
-
+from fastapi.middleware.cors import CORSMiddleware
 
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 root = os.path.dirname(os.path.abspath(__file__))
 
