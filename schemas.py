@@ -73,7 +73,7 @@ class TerminalUpdate(TerminalBase):
 class RouteBase(BaseModel):
     transport_company: str
     name: str
-    stops: str
+    stops: list[str]
 
 
 class RouteCreate(RouteBase):
@@ -90,8 +90,8 @@ class Route(RouteBase):
 
 class TransportCompanyBase(BaseModel):
     name: str
-    routes: str
-    terminals: str
+    routes: list[str]
+    terminals: list[int]
 
 
 class TransportCompany(TransportCompanyBase):

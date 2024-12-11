@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Float, DateTime
+from sqlalchemy import Column, Integer, String, Float, DateTime, ARRAY
 from sqlalchemy.dialects.postgresql import BYTEA
 
 from sqlalchemy.dialects.mysql.types import BIT
@@ -44,13 +44,12 @@ class TransportCompany(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String)
-    routes = Column(String)
-    terminals = Column(String)
+    routes = Column(ARRAY(String))
+    terminals = Column(ARRAY(Integer))
 
 class Route(Base):
     __tablename__ = "routes"
     id = Column(Integer, primary_key=True)
     transport_company = Column(String)
     name = Column(String)
-    stops = Column(String)
-
+    stops = Column(ARRAY(String))
