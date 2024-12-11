@@ -6,7 +6,7 @@
 
 2. Установить все необходимые библиотеки и фреймворки: `pip install -r requirements.txt`
 
-3. Установить postgresql.
+3. Установить postgresql
 
 4. Запустить приложение: `uvicorn main:app --reload`
 
