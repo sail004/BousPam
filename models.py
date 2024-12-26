@@ -1,8 +1,4 @@
 from sqlalchemy import Column, Integer, String, Float, DateTime, ARRAY
-from sqlalchemy.dialects.postgresql import BYTEA
-
-from sqlalchemy.dialects.mysql.types import BIT
-import schemas
 from database import Base
 
 

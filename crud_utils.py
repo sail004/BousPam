@@ -1,12 +1,9 @@
 from datetime import datetime
-from base64 import b64encode, b64decode
 from sqlalchemy.orm import Session
 import models
 import hashlib
 import os
 import schemas
-from fastapi import HTTPException
-# from . import models, schemas
 
 
 def get_user_by_id(db: Session, user_id: int):
@@ -50,7 +47,7 @@ def create_operation_payment(db: Session, operation: schemas.OperationPaymentCre
         id_terminal=operation.id_terminal,
         id_user=operation.id_user,
         balance_change=operation.balance_change,
-        datetime=datetime.now())
+        datetime=operation.request_time)
     db.add(db_operation)
     db.commit()
     db.refresh(db_operation)

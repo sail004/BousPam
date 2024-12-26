@@ -1,4 +1,6 @@
-from fastapi import Depends, FastAPI, HTTPException, Response, Request
+from datetime import datetime, timedelta
+
+from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy.orm import Session
 import os
 import crud_utils
@@ -77,12 +79,6 @@ def get_user_balance_by_id(user_id: int, db: Session = Depends(get_db)):
 def read_operations(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     operations = crud_utils.get_operations(db, skip=skip, limit=limit)
     return operations
-#@app.get("/user/get-user-by-name/{user_name}") #, response_model=schemas.Product
-#def read_user_by_name(user_name: str, db: Session = Depends(get_db)):
-#    db_user = crud_utils.get_user_by_name(db, name=user_name)
-#    if db_user is None:
-#        raise HTTPException(status_code=404, detail=f"User with name=\'{user_name}\' not found")
-#    return db_user
 
 
 @app.get("/operations/{term_id}") #, response_model=schemas.Product
@@ -117,6 +113,13 @@ def payment_by_user_id(operation: schemas.OperationPaymentCreate, db: Session = 
         raise HTTPException(status_code=404, detail=f"Terminal with id=\'{operation.id_terminal}\' not found")
     if db_user is None:
         raise HTTPException(status_code=404, detail=f"User with id=\'{operation.id_user}\' not found")
+    delta_time = datetime.now() - operation.request_time
+    if delta_time < timedelta(minutes=1):
+        if db_user.balance < abs(operation.balance_change):
+            return HTTPException(status_code=400, detail=f"Insufficient funds to make the payment")
+        else:
+            crud_utils.create_operation_payment(db, operation, 'payment')
+            return crud_utils.update_balance(db, user_id=operation.id_user, balance=-operation.balance_change)
     crud_utils.create_operation_payment(db, operation, 'payment')
     return crud_utils.update_balance(db, user_id=operation.id_user, balance=-operation.balance_change)
 

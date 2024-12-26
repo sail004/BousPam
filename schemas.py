@@ -1,5 +1,4 @@
 from __future__ import annotations
-from typing import Union
 from pydantic import BaseModel
 from datetime import datetime
 
@@ -43,6 +42,7 @@ class Operation(OperationBase):
 
 class OperationPaymentCreate(OperationBase):
     id_terminal: int
+    request_time: datetime
 
 
 class OperationReplenishmentCreate(OperationBase):
