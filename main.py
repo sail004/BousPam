@@ -114,14 +114,15 @@ def payment_by_user_id(operation: schemas.OperationPaymentCreate, db: Session = 
     if db_user is None:
         raise HTTPException(status_code=404, detail=f"User with id=\'{operation.id_user}\' not found")
     delta_time = datetime.now() - operation.request_time
+    #crud_utils.create_operation_payment(db, operation, 'payment')
+    balance_change = crud_utils.create_operation_payment(db, operation, 'payment')
     if delta_time < timedelta(minutes=1):
-        if db_user.balance < abs(operation.balance_change):
+        if db_user.balance < abs(balance_change):
             return HTTPException(status_code=400, detail=f"Insufficient funds to make the payment")
         else:
             crud_utils.create_operation_payment(db, operation, 'payment')
-            return crud_utils.update_balance(db, user_id=operation.id_user, balance=-operation.balance_change)
-    crud_utils.create_operation_payment(db, operation, 'payment')
-    return crud_utils.update_balance(db, user_id=operation.id_user, balance=-operation.balance_change)
+            return crud_utils.update_balance(db, user_id=operation.id_user, balance=-balance_change)
+    return crud_utils.update_balance(db, user_id=operation.id_user, balance=-balance_change)
 
 
 @app.put("/replenishment/{user_id}") #, response_model=schemas.Product

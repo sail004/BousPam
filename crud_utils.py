@@ -42,16 +42,18 @@ def create_user(db: Session, user: schemas.UserCreate):
 
 
 def create_operation_payment(db: Session, operation: schemas.OperationPaymentCreate, op_type: str):
+    route = get_route_by_name(db, operation.route)
+    price = route.price
     db_operation = models.Operation(
         type=op_type,
         id_terminal=operation.id_terminal,
         id_user=operation.id_user,
-        balance_change=operation.balance_change,
+        balance_change=-price,
         datetime=operation.request_time)
     db.add(db_operation)
     db.commit()
     db.refresh(db_operation)
-    return db_operation
+    return price
 
 
 def create_operation_replenishment(db: Session, operation: schemas.OperationReplenishmentCreate, op_type: str):
@@ -147,7 +149,8 @@ def create_route(db: Session, route: schemas.RouteCreate):
     db_route = models.Route(
         transport_company=route.transport_company,
         name = route.name,
-        stops = route.stops
+        stops = route.stops,
+        price = route.price,
     )
     db.add(db_route)
     db.commit()

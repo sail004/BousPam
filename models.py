@@ -49,3 +49,4 @@ class Route(Base):
     transport_company = Column(String)
     name = Column(String)
     stops = Column(ARRAY(String))
+    price = Column(Integer)

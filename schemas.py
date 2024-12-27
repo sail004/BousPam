@@ -30,12 +30,12 @@ class User(UserBase):
 
 
 class OperationBase(BaseModel):
-    balance_change: float
     id_user: int
 
 
 class Operation(OperationBase):
     id_operation: int
+    balance_change: float
     type: str
     datetime: datetime
 
@@ -73,6 +73,7 @@ class TerminalUpdate(TerminalBase):
 class RouteBase(BaseModel):
     transport_company: str
     name: str
+    price: int
     stops: list[str]
 
 
