@@ -27,7 +27,7 @@ class User(UserBase):
     salt: str
     key: str
     balance: float
-
+    
 
 class OperationBase(BaseModel):
     id_user: int
