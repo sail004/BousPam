@@ -1,5 +1,8 @@
 from datetime import datetime
 from sqlalchemy.orm import Session
+from sqlalchemy.sql.functions import random
+import string
+import random
 import models
 import hashlib
 import os
@@ -109,9 +112,13 @@ def get_operations_by_user_id(db: Session, user_id: int):
 
 
 def create_terminal(db: Session, terminal: schemas.TerminalCreate):
+    random_string = ''.join(random.choices(string.ascii_letters + string.digits, k=8))
+    hash = hashlib.pbkdf2_hmac('sha256', random_string.encode('utf-8'), os.urandom(32), 100000, dklen=128)
     db_term = models.Terminal(
         transport_company=terminal.transport_company,
-        route = terminal.route
+        route = terminal.route,
+        bus_number=terminal.bus_number,
+        hash=hash.hex()
     )
     db.add(db_term)
     db.commit()
@@ -233,3 +240,17 @@ def delete_transport_company(db: Session, tc_id: int):
 
     db.delete(db_company)
     db.commit()
+
+
+def get_bus_by_number(db: Session, bus_number: str):
+    return db.query(models.Bus).filter(models.Bus.number == bus_number).first()
+
+
+def create_bus(db: Session, bus: schemas.BusCreate):
+    db_bus = models.Bus(
+        number=bus.number,
+    )
+    db.add(db_bus)
+    db.commit()
+    db.refresh(db_bus)
+    return db_bus

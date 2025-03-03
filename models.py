@@ -33,7 +33,9 @@ class Terminal(Base):
 
     id = Column(Integer, primary_key=True)
     transport_company = Column(String)
+    bus_number = Column(String)
     route = Column(String)
+    hash = Column(String)
 
 class TransportCompany(Base):
     __tablename__ = "transport_companies"
@@ -50,3 +52,9 @@ class Route(Base):
     name = Column(String)
     stops = Column(ARRAY(String))
     price = Column(Integer)
+
+
+class Bus(Base):
+    __tablename__ = "buses"
+    id = Column(Integer, primary_key=True)
+    number = Column(String)

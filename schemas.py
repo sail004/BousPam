@@ -55,11 +55,13 @@ class OperationUpdate(OperationBase):
 
 class TerminalBase(BaseModel):
     transport_company: str
+    bus_number: str
     route: str
 
 
 class Terminal(TerminalBase):
     id: int
+    hash: str
 
 
 class TerminalCreate(TerminalBase):
@@ -105,3 +107,19 @@ class TransportCompanyCreate(TransportCompanyBase):
 
 class TransportCompanyUpdate(TransportCompanyBase):
     pass
+
+
+class BusBase(BaseModel):
+    number: str
+
+
+class BusCreate(BusBase):
+    pass
+
+
+class BusUpdate(BusBase):
+    pass
+
+
+class Bus(RouteBase):
+    id: int

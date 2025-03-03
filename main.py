@@ -150,9 +150,12 @@ def delete_user_by_id(user_id: int, db: Session = Depends(get_db)):
 @app.post("/terminal/") #, response_model=schemas.ProductCreate
 def create_terminal(terminal: schemas.TerminalCreate, db: Session = Depends(get_db)):
     db_route = crud_utils.get_route_by_name(db, route_name=terminal.route)
+    db_bus = crud_utils.get_bus_by_number(db, bus_number=terminal.bus_number)
     if db_route is None:
         raise HTTPException(status_code=404, detail=f"Route with name=\'{terminal.route}\' not found")
-    return crud_utils.create_terminal(db=db, terminal=terminal).id
+    if db_route is None:
+        raise HTTPException(status_code=404, detail=f"Bus with number=\'{terminal.bus_number}\' not found")
+    return crud_utils.create_terminal(db=db, terminal=terminal)
 
 
 @app.get("/terminal/{term_id}") #, response_model=schemas.Product
@@ -250,3 +253,7 @@ def delete_transport_company_by_id(tc_id: int, db: Session = Depends(get_db)):
         "status": "ok",
         "message": "Deletion was successful"
     }
+
+@app.post("/bus/") #, response_model=schemas.ProductCreate
+def create_bus(bus: schemas.BusCreate, db: Session = Depends(get_db)):
+    return crud_utils.create_bus(db=db, bus=bus).id
