@@ -42,6 +42,7 @@ class Operation(OperationBase):
 
 class OperationPaymentCreate(OperationBase):
     id_terminal: int
+    terminal_hash: str
     request_time: datetime
 
 

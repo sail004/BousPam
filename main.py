@@ -1,4 +1,5 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
+
 
 from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy.orm import Session
@@ -113,7 +114,9 @@ def payment_by_user_id(operation: schemas.OperationPaymentCreate, db: Session = 
         raise HTTPException(status_code=404, detail=f"Terminal with id=\'{operation.id_terminal}\' not found")
     if db_user is None:
         raise HTTPException(status_code=404, detail=f"User with id=\'{operation.id_user}\' not found")
-    delta_time = datetime.now() - operation.request_time
+    if db_terminal.hash != operation.terminal_hash:
+        raise HTTPException(status_code=404, detail=f"Incorrect terminal hash")
+    delta_time = datetime.now() - operation.request_time.replace(tzinfo=None)
     #crud_utils.create_operation_payment(db, operation, 'payment')
     balance_change = crud_utils.create_operation_payment(db, operation, 'payment')
     if delta_time < timedelta(minutes=1):

@@ -45,14 +45,16 @@ def create_user(db: Session, user: schemas.UserCreate):
 
 
 def create_operation_payment(db: Session, operation: schemas.OperationPaymentCreate, op_type: str):
-    route = get_route_by_name(db, operation.route)
-    price = route.price
+    route_name = get_terminal_by_id(db=db, terminal_id=operation.id_terminal).route
+    price = get_route_by_name(db=db, route_name=route_name).price
     db_operation = models.Operation(
         type=op_type,
         id_terminal=operation.id_terminal,
         id_user=operation.id_user,
         balance_change=-price,
-        datetime=operation.request_time)
+        datetime=operation.request_time,
+        terminal_hash=operation.terminal_hash
+    )
     db.add(db_operation)
     db.commit()
     db.refresh(db_operation)

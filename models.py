@@ -22,6 +22,7 @@ class Operation(Base):
 
     id_operation = Column(Integer, primary_key=True)
     id_terminal = Column(Integer)
+    terminal_hash = Column(String)
     bank_name = Column(String)
     id_user = Column(Integer)
     type = Column(String)
