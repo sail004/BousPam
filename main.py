@@ -260,3 +260,46 @@ def delete_transport_company_by_id(tc_id: int, db: Session = Depends(get_db)):
 @app.post("/bus/") #, response_model=schemas.ProductCreate
 def create_bus(bus: schemas.BusCreate, db: Session = Depends(get_db)):
     return crud_utils.create_bus(db=db, bus=bus).id
+
+
+@app.put("/bus/{bus_id}") #, response_model=schemas.Product
+def update_bus_by_id(bus_id: int, bus: schemas.BusUpdate, db: Session = Depends(get_db)):
+    db_bus = crud_utils.get_bus_by_id(db, bus_id=bus_id)
+    if db_bus is None:
+        raise HTTPException(status_code=404, detail=f"Bus with id=\'{bus_id}\' not found")
+    return crud_utils.update_bus(db, bus=bus, bus_id=bus_id)
+
+
+@app.get("/bus/{bus_number}") #, response_model=schemas.Product
+def read_bus_by_number(bus_number: str, db: Session = Depends(get_db)):
+    db_bus = crud_utils.get_bus_by_number(db, bus_number=bus_number)
+    if db_bus is None:
+        raise HTTPException(status_code=404, detail=f"Bus with number=\'{bus_number}\' not found")
+    return db_bus
+
+
+@app.get("/buses/") #, response_model=List[schemas.Product]
+def read_buses(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    buses = crud_utils.get_buses(db, skip=skip, limit=limit)
+    return buses
+
+
+@app.get("/buses/{company_name}") #, response_model=schemas.Product
+def read_buses_by_company_name(company_name: str, db: Session = Depends(get_db)):
+    db_buses = crud_utils.get_buses_by_company_name(db, company_name=company_name)
+    if db_buses is None:
+        raise HTTPException(status_code=404, detail=f"Buses owned by the сompany with name=\'{company_name}\' not found")
+    return db_buses
+
+
+@app.delete("/bus/{bus_id}") #, response_model=dict
+def delete_bus_by_id(bus_id: int, db: Session = Depends(get_db)):
+    db_bus = crud_utils.get_bus_by_id(db, bus_id=bus_id)
+    if db_bus is None:
+        raise HTTPException(status_code=404, detail=f"Bus with id=\'{bus_id}\' not found")
+    crud_utils.delete_bus(db, bus_id=bus_id)
+
+    return {
+        "status": "ok",
+        "message": "Deletion was successful"
+    }

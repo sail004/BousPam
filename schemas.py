@@ -112,6 +112,7 @@ class TransportCompanyUpdate(TransportCompanyBase):
 
 class BusBase(BaseModel):
     number: str
+    company_name: str
 
 
 class BusCreate(BusBase):

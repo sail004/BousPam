@@ -251,8 +251,38 @@ def get_bus_by_number(db: Session, bus_number: str):
 def create_bus(db: Session, bus: schemas.BusCreate):
     db_bus = models.Bus(
         number=bus.number,
+        company_name=bus.company_name
     )
     db.add(db_bus)
     db.commit()
     db.refresh(db_bus)
     return db_bus
+
+
+def get_bus_by_id(db: Session, bus_id: int) -> object:
+    return db.query(models.Bus).filter(models.Bus.id == bus_id).first()
+
+
+def update_bus(db: Session, bus: schemas.BusUpdate, bus_id: int):
+    db_bus = get_bus_by_id(db, bus_id=bus_id)
+    bus_data = bus.dict()
+
+    for key, value in bus_data.items():
+        setattr(db_bus, key, value)
+    db.add(db_bus)
+    db.commit()
+    return db_bus
+
+def get_buses(db: Session, skip: int = 0, limit: int = 100):
+    return db.query(models.Bus).all()
+
+
+def get_buses_by_company_name(db: Session, company_name: str):
+    return list(db.query(models.Bus).filter(models.Bus.company_name == company_name))
+
+
+def delete_bus(db: Session, bus_id: int):
+    db_bus = get_bus_by_id(db, bus_id=bus_id)
+
+    db.delete(db_bus)
+    db.commit()

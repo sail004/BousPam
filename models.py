@@ -59,3 +59,4 @@ class Bus(Base):
     __tablename__ = "buses"
     id = Column(Integer, primary_key=True)
     number = Column(String)
+    company_name = Column(String)
