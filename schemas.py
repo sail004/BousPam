@@ -56,8 +56,7 @@ class OperationUpdate(OperationBase):
 
 class TerminalBase(BaseModel):
     transport_company: str
-    bus_number: str
-    route: str
+    price: int
 
 
 class Terminal(TerminalBase):
@@ -73,29 +72,8 @@ class TerminalUpdate(TerminalBase):
     pass
 
 
-class RouteBase(BaseModel):
-    transport_company: str
-    name: str
-    price: int
-    stops: list[str]
-
-
-class RouteCreate(RouteBase):
-    pass
-
-
-class RouteUpdate(RouteBase):
-    pass
-
-
-class Route(RouteBase):
-    id: int
-
-
 class TransportCompanyBase(BaseModel):
     name: str
-    routes: list[str]
-    terminals: list[int]
 
 
 class TransportCompany(TransportCompanyBase):
@@ -108,20 +86,3 @@ class TransportCompanyCreate(TransportCompanyBase):
 
 class TransportCompanyUpdate(TransportCompanyBase):
     pass
-
-
-class BusBase(BaseModel):
-    number: str
-    company_name: str
-
-
-class BusCreate(BusBase):
-    pass
-
-
-class BusUpdate(BusBase):
-    pass
-
-
-class Bus(RouteBase):
-    id: int

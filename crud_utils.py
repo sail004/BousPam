@@ -44,9 +44,12 @@ def create_user(db: Session, user: schemas.UserCreate):
     return db_user
 
 
+def get_price_by_terminal_id(db: Session, terminal_id: int):
+    return get_terminal_by_id(db=db, terminal_id=terminal_id).price
+
+
 def create_operation_payment(db: Session, operation: schemas.OperationPaymentCreate, op_type: str):
-    route_name = get_terminal_by_id(db=db, terminal_id=operation.id_terminal).route
-    price = get_route_by_name(db=db, route_name=route_name).price
+    price = get_price_by_terminal_id(db=db, terminal_id=operation.id_terminal)
     db_operation = models.Operation(
         type=op_type,
         id_terminal=operation.id_terminal,
@@ -58,7 +61,7 @@ def create_operation_payment(db: Session, operation: schemas.OperationPaymentCre
     db.add(db_operation)
     db.commit()
     db.refresh(db_operation)
-    return price
+    return update_balance(db, operation.id_user, -price)
 
 
 def create_operation_replenishment(db: Session, operation: schemas.OperationReplenishmentCreate, op_type: str):
@@ -71,7 +74,7 @@ def create_operation_replenishment(db: Session, operation: schemas.OperationRepl
     db.add(db_operation)
     db.commit()
     db.refresh(db_operation)
-    return db_operation
+    return update_balance(db, operation.id_user, operation.balance_change)
 
 
 def update_user(db: Session, user: schemas.UserUpdate, user_id: int):
@@ -118,8 +121,7 @@ def create_terminal(db: Session, terminal: schemas.TerminalCreate):
     hash = hashlib.pbkdf2_hmac('sha256', random_string.encode('utf-8'), os.urandom(32), 100000, dklen=128)
     db_term = models.Terminal(
         transport_company=terminal.transport_company,
-        route = terminal.route,
-        bus_number=terminal.bus_number,
+        price=terminal.price,
         hash=hash.hex()
     )
     db.add(db_term)
@@ -154,45 +156,6 @@ def get_terminals_by_company(db: Session, company_name: str):
     return list(db.query(models.Terminal).filter(models.Terminal.transport_company == company_name))
 
 
-def create_route(db: Session, route: schemas.RouteCreate):
-    db_route = models.Route(
-        transport_company=route.transport_company,
-        name = route.name,
-        stops = route.stops,
-        price = route.price,
-    )
-    db.add(db_route)
-    db.commit()
-    db.refresh(db_route)
-    return db_route
-
-
-def get_route_by_id(db: Session, route_id: int):
-    return db.query(models.Route).filter(models.Route.id == route_id).first()
-
-
-def update_route(db: Session, route: schemas.RouteUpdate, route_id: int):
-    db_route = get_route_by_id(db, route_id=route_id)
-    route_data = route.dict()
-
-    for key, value in route_data.items():
-        setattr(db_route, key, value)
-    db.add(db_route)
-    db.commit()
-    return db_route
-
-
-def delete_route(db: Session, route_id: int):
-    db_route = get_route_by_id(db, route_id=route_id)
-
-    db.delete(db_route)
-    db.commit()
-
-
-def get_route_by_name(db: Session, route_name: str):
-    return db.query(models.Route).filter(models.Route.name == route_name).first()
-
-
 def login_user(db: Session, phone_number: str, password: str):
     user = db.query(models.User).filter(models.User.phone_number == phone_number).first()
     if user is None:
@@ -212,9 +175,7 @@ def login_user(db: Session, phone_number: str, password: str):
 
 def create_transport_company(db: Session, company: schemas.TransportCompanyCreate):
     db_company = models.TransportCompany(
-        name=company.name,
-        routes=company.routes,
-        terminals=company.terminals
+        name=company.name
     )
     db.add(db_company)
     db.commit()
@@ -224,6 +185,10 @@ def create_transport_company(db: Session, company: schemas.TransportCompanyCreat
 
 def get_transport_company_by_id(db: Session, tc_id: int) -> object:
     return db.query(models.TransportCompany).filter(models.TransportCompany.id == tc_id).first()
+
+
+def get_transport_company_by_name(db: Session, tc_name: str) -> object:
+    return db.query(models.TransportCompany).filter(models.TransportCompany.name == tc_name).first()
 
 
 def update_transport_company(db: Session, company: schemas.TransportCompanyUpdate, tc_id: int):
@@ -241,48 +206,4 @@ def delete_transport_company(db: Session, tc_id: int):
     db_company = get_transport_company_by_id(db, tc_id=tc_id)
 
     db.delete(db_company)
-    db.commit()
-
-
-def get_bus_by_number(db: Session, bus_number: str):
-    return db.query(models.Bus).filter(models.Bus.number == bus_number).first()
-
-
-def create_bus(db: Session, bus: schemas.BusCreate):
-    db_bus = models.Bus(
-        number=bus.number,
-        company_name=bus.company_name
-    )
-    db.add(db_bus)
-    db.commit()
-    db.refresh(db_bus)
-    return db_bus
-
-
-def get_bus_by_id(db: Session, bus_id: int) -> object:
-    return db.query(models.Bus).filter(models.Bus.id == bus_id).first()
-
-
-def update_bus(db: Session, bus: schemas.BusUpdate, bus_id: int):
-    db_bus = get_bus_by_id(db, bus_id=bus_id)
-    bus_data = bus.dict()
-
-    for key, value in bus_data.items():
-        setattr(db_bus, key, value)
-    db.add(db_bus)
-    db.commit()
-    return db_bus
-
-def get_buses(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(models.Bus).all()
-
-
-def get_buses_by_company_name(db: Session, company_name: str):
-    return list(db.query(models.Bus).filter(models.Bus.company_name == company_name))
-
-
-def delete_bus(db: Session, bus_id: int):
-    db_bus = get_bus_by_id(db, bus_id=bus_id)
-
-    db.delete(db_bus)
     db.commit()
