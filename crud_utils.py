@@ -175,7 +175,7 @@ def login_user(db: Session, phone_number: str, password: str):
 
 def create_transport_company(db: Session, company: schemas.TransportCompanyCreate):
     db_company = models.TransportCompany(
-        name=company.name
+        name=company.name,
     )
     db.add(db_company)
     db.commit()
