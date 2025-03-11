@@ -12,11 +12,17 @@ import schemas
 def get_user_by_id(db: Session, user_id: int):
     return db.query(models.User).filter(models.User.id == user_id).first()
 
+
 def get_balance_by_id(db: Session, user_id: int):
     return db.query(models.User).filter(models.User.id == user_id).first().balance
 
+
 def get_user_by_name(db: Session, name: str):
     return db.query(models.User).filter(models.User.name == name).first()
+
+
+def get_user_by_surname(db: Session, surname: str):
+    return db.query(models.User).filter(models.User.surname == surname).first()
 
 
 def get_user_by_phone_number(db: Session, phone_number: str):
@@ -176,6 +182,8 @@ def login_user(db: Session, phone_number: str, password: str):
 def create_transport_company(db: Session, company: schemas.TransportCompanyCreate):
     db_company = models.TransportCompany(
         name=company.name,
+        owner_name=company.owner_name,
+        owner_surname=company.owner_surname
     )
     db.add(db_company)
     db.commit()
@@ -207,3 +215,11 @@ def delete_transport_company(db: Session, tc_id: int):
 
     db.delete(db_company)
     db.commit()
+
+
+def get_transport_companies(db: Session, skip: int = 0, limit: int = 100):
+    return db.query(models.TransportCompany).all()
+
+
+def get_terminals(db: Session, skip: int = 0, limit: int = 100):
+    return db.query(models.Terminal).all()

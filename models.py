@@ -41,4 +41,6 @@ class TransportCompany(Base):
     __tablename__ = "transport_companies"
 
     id = Column(Integer, primary_key=True)
+    owner_name = Column(String)
+    owner_surname = Column(String)
     name = Column(String)

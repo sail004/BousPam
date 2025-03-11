@@ -164,6 +164,12 @@ def read_terminal_by_id(term_id: int, db: Session = Depends(get_db)):
     return db_term
 
 
+@app.get("/terminals/") #, response_model=List[schemas.Product]
+def read_terminals(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    terminals = crud_utils.get_terminals(db, skip=skip, limit=limit)
+    return terminals
+
+
 @app.get("/terminals/{company_name}") #, response_model=schemas.Product
 def read_terminals_by_company_name(company_name: str, db: Session = Depends(get_db)):
     db_term = crud_utils.get_terminals_by_company(db, company_name=company_name)
@@ -195,6 +201,12 @@ def delete_terminal_by_id(term_id: int, db: Session = Depends(get_db)):
 
 @app.post("/tc/") #, response_model=schemas.ProductCreate
 def create_transport_company(tc: schemas.TransportCompanyCreate, db: Session = Depends(get_db)):
+    db_owner_name = crud_utils.get_user_by_name(db, name=tc.owner_name)
+    if db_owner_name is None:
+        raise HTTPException(status_code=404, detail=f"User with name=\'{tc.owner_name}\' not found")
+    db_owner_surname = crud_utils.get_user_by_surname(db, surname=tc.owner_surname)
+    if db_owner_surname is None:
+        raise HTTPException(status_code=404, detail=f"User with surname=\'{tc.owner_surname}\' not found")
     return crud_utils.create_transport_company(db=db, company=tc).id
 
 
@@ -204,6 +216,12 @@ def update_transport_company_by_id(tc_id: int, tc: schemas.TransportCompanyUpdat
     if db_company is None:
         raise HTTPException(status_code=404, detail=f"Company with id=\'{tc_id}\' not found")
     return crud_utils.update_transport_company(db, company=tc, tc_id=tc_id)
+
+
+@app.get("/tcs/") #, response_model=List[schemas.Product]
+def read_transport_companies(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    transport_companies = crud_utils.get_transport_companies(db, skip=skip, limit=limit)
+    return transport_companies
 
 
 @app.delete("/tc/{tc_id}") #, response_model=dict

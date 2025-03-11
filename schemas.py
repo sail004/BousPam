@@ -74,6 +74,8 @@ class TerminalUpdate(TerminalBase):
 
 class TransportCompanyBase(BaseModel):
     name: str
+    owner_name: str
+    owner_surname: str
 
 
 class TransportCompany(TransportCompanyBase):
