@@ -44,3 +44,17 @@ class TransportCompany(Base):
     owner_name = Column(String)
     owner_surname = Column(String)
     name = Column(String)
+
+class Employee(Base):
+    __tablename__ = "employees"
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String)
+    surname = Column(String)
+    login = Column(String)
+    key = Column(String)
+    salt = Column(String)
+    gender = Column(String)
+    date_of_birth = Column(String)
+    phone_number = Column(String)
+    role = Column(String)

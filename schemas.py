@@ -88,3 +88,29 @@ class TransportCompanyCreate(TransportCompanyBase):
 
 class TransportCompanyUpdate(TransportCompanyBase):
     pass
+
+
+class EmployeeBase(BaseModel):
+    name: str
+    surname: str
+    password: str
+    role: str
+    login: str
+    gender: str
+    date_of_birth: str
+    phone_number: str
+
+
+class EmployeeCreate(EmployeeBase):
+    pass
+
+
+class EmployeeUpdate(EmployeeBase):
+    pass
+
+
+class Employee(EmployeeBase):
+    id: int
+    salt: str
+    key: str
+

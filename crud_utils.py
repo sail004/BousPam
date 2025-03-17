@@ -223,3 +223,70 @@ def get_transport_companies(db: Session, skip: int = 0, limit: int = 100):
 
 def get_terminals(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.Terminal).all()
+
+
+def create_employee(db: Session, employee: schemas.EmployeeCreate):
+    salt = os.urandom(32)
+    key = hashlib.pbkdf2_hmac('sha256', employee.password.encode('utf-8'), salt, 100000, dklen=128)
+    db_employee = models.Employee(
+        name=employee.name,
+        surname=employee.surname,
+        login=employee.login,
+        gender=employee.gender,
+        date_of_birth=employee.date_of_birth,
+        salt=salt.hex(),
+        key=key.hex(),
+        role=employee.role,
+        phone_number=employee.phone_number,
+        )
+    db.add(db_employee)
+    db.commit()
+    db.refresh(db_employee)
+    return db_employee
+
+
+def get_employee_by_phone_number(db: Session, phone_number: str):
+    return db.query(models.Employee).filter(models.Employee.phone_number == phone_number).first()
+
+
+def get_employees(db: Session, skip: int = 0, limit: int = 100):
+    return db.query(models.Employee).all()
+
+
+def login_employee(db: Session, login: str, password: str):
+    employee = db.query(models.Employee).filter(models.Employee.login == login).first()
+    if employee is None:
+        return 'numb'
+    salt = bytes.fromhex(employee.salt)
+    key = bytes.fromhex(employee.key)
+    new_key = hashlib.pbkdf2_hmac(
+        'sha256',
+        password.encode('utf-8'),
+        salt,
+        100000,
+        dklen=128)
+    if new_key == key:
+        return employee
+    return 'inc'
+
+
+def get_employee_by_id(db: Session, employee_id: int):
+    return db.query(models.Employee).filter(models.Employee.id == employee_id).first()
+
+
+def update_employee(db: Session, employee: schemas.EmployeeUpdate, employee_id: int):
+    db_employee = get_employee_by_id(db, employee_id=employee_id)
+    employee_data = employee.dict()
+
+    for key, value in employee_data.items():
+        setattr(db_employee, key, value)
+    db.add(db_employee)
+    db.commit()
+    return db_employee
+
+
+def delete_employee(db: Session, employee_id: int):
+    db_employee = get_employee_by_id(db, employee_id=employee_id)
+
+    db.delete(db_employee)
+    db.commit()
