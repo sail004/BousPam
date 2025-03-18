@@ -69,7 +69,6 @@ def create_operation_payment(db: Session, operation: schemas.OperationPaymentCre
 def create_operation_replenishment(db: Session, operation: schemas.OperationReplenishmentCreate, op_type: str):
     db_operation = models.Operation(
         type=op_type,
-        bank_name=operation.bank_name,
         id_user=operation.id_user,
         balance_change=operation.balance_change,
         datetime=datetime.now())

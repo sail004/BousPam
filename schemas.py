@@ -44,7 +44,7 @@ class OperationPaymentCreate(OperationBase):
 
 
 class OperationReplenishmentCreate(OperationBase):
-    bank_name: str
+    balance_change: float
 
 
 class OperationUpdate(OperationBase):
