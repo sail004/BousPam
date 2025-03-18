@@ -50,14 +50,14 @@ def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     return users
 
 
-@app.get("/login/") #, response_model=List[schemas.Product]
-def login_user(phone_number: str, password: str, db: Session = Depends(get_db)):
-    db_user = crud_utils.login_user(db, phone_number=phone_number, password=password)
-    if db_user == 'numb':
-        return 'Incorrect phone number'
-    if db_user == 'inc':
-        return 'Incorrect password'
-    return db_user
+#@app.get("/login/") #, response_model=List[schemas.Product]
+#def login_user(phone_number: str, password: str, db: Session = Depends(get_db)):
+#    db_user = crud_utils.login_user(db, phone_number=phone_number, password=password)
+#    if db_user == 'numb':
+#        return 'Incorrect phone number'
+#    if db_user == 'inc':
+#        return 'Incorrect password'
+#    return db_user
 
 
 @app.get("/user/{user_id}") #, response_model=schemas.Product

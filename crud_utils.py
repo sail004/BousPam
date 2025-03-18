@@ -34,14 +34,10 @@ def get_users(db: Session, skip: int = 0, limit: int = 100):
 
 
 def create_user(db: Session, user: schemas.UserCreate):
-    salt = os.urandom(32)
-    key = hashlib.pbkdf2_hmac('sha256', user.password.encode('utf-8'), salt, 100000, dklen=128)
     db_user = models.User(
         name=user.name,
         surname=user.surname,
         balance=0.0,
-        salt=salt.hex(),
-        key=key.hex(),
         phone_number=user.phone_number,
         )
     db.add(db_user)

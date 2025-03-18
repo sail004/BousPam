@@ -6,9 +6,11 @@ from datetime import datetime
 class UserBase(BaseModel):
     name: str
     surname: str
-    password: str
     phone_number: str
-
+    e_mail: str
+    passport_number: str
+    snils: str
+    inn: str
 
 
 class UserCreate(UserBase):
@@ -16,16 +18,11 @@ class UserCreate(UserBase):
 
 
 class UserUpdate(UserBase):
-    e_mail: str
-    passport_number: str
-    snils: str
-    inn: str
+    pass
 
 
 class User(UserBase):
     id: int
-    salt: str
-    key: str
     balance: float
     
 
