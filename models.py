@@ -7,8 +7,6 @@ class User(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String)
-    key = Column(String)
-    salt = Column(String)
     surname = Column(String)
     phone_number = Column(String)
     balance = Column(Float)
@@ -22,7 +20,7 @@ class Operation(Base):
 
     id_operation = Column(Integer, primary_key=True)
     id_terminal = Column(Integer)
-    bank_name = Column(String)
+    terminal_hash = Column(String)
     id_user = Column(Integer)
     type = Column(String)
     balance_change = Column(Float)
@@ -33,19 +31,27 @@ class Terminal(Base):
 
     id = Column(Integer, primary_key=True)
     transport_company = Column(String)
-    route = Column(String)
+    price = Column(Integer)
+    hash = Column(String)
 
 class TransportCompany(Base):
     __tablename__ = "transport_companies"
 
     id = Column(Integer, primary_key=True)
+    owner_name = Column(String)
+    owner_surname = Column(String)
     name = Column(String)
-    routes = Column(ARRAY(String))
-    terminals = Column(ARRAY(Integer))
 
-class Route(Base):
-    __tablename__ = "routes"
+class Employee(Base):
+    __tablename__ = "employees"
+
     id = Column(Integer, primary_key=True)
-    transport_company = Column(String)
     name = Column(String)
-    stops = Column(ARRAY(String))
+    surname = Column(String)
+    login = Column(String)
+    key = Column(String)
+    salt = Column(String)
+    gender = Column(String)
+    date_of_birth = Column(String)
+    phone_number = Column(String)
+    role = Column(String)

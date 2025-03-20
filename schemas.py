@@ -6,9 +6,11 @@ from datetime import datetime
 class UserBase(BaseModel):
     name: str
     surname: str
-    password: str
     phone_number: str
-
+    e_mail: str
+    passport_number: str
+    snils: str
+    inn: str
 
 
 class UserCreate(UserBase):
@@ -16,37 +18,33 @@ class UserCreate(UserBase):
 
 
 class UserUpdate(UserBase):
-    e_mail: str
-    passport_number: str
-    snils: str
-    inn: str
+    pass
 
 
 class User(UserBase):
     id: int
-    salt: str
-    key: str
     balance: float
-
+    
 
 class OperationBase(BaseModel):
-    balance_change: float
     id_user: int
 
 
 class Operation(OperationBase):
     id_operation: int
+    balance_change: float
     type: str
     datetime: datetime
 
 
 class OperationPaymentCreate(OperationBase):
     id_terminal: int
+    terminal_hash: str
     request_time: datetime
 
 
 class OperationReplenishmentCreate(OperationBase):
-    bank_name: str
+    balance_change: float
 
 
 class OperationUpdate(OperationBase):
@@ -55,11 +53,12 @@ class OperationUpdate(OperationBase):
 
 class TerminalBase(BaseModel):
     transport_company: str
-    route: str
+    price: int
 
 
 class Terminal(TerminalBase):
     id: int
+    hash: str
 
 
 class TerminalCreate(TerminalBase):
@@ -70,28 +69,10 @@ class TerminalUpdate(TerminalBase):
     pass
 
 
-class RouteBase(BaseModel):
-    transport_company: str
-    name: str
-    stops: list[str]
-
-
-class RouteCreate(RouteBase):
-    pass
-
-
-class RouteUpdate(RouteBase):
-    pass
-
-
-class Route(RouteBase):
-    id: int
-
-
 class TransportCompanyBase(BaseModel):
     name: str
-    routes: list[str]
-    terminals: list[int]
+    owner_name: str
+    owner_surname: str
 
 
 class TransportCompany(TransportCompanyBase):
@@ -104,3 +85,29 @@ class TransportCompanyCreate(TransportCompanyBase):
 
 class TransportCompanyUpdate(TransportCompanyBase):
     pass
+
+
+class EmployeeBase(BaseModel):
+    name: str
+    surname: str
+    password: str
+    role: str
+    login: str
+    gender: str
+    date_of_birth: str
+    phone_number: str
+
+
+class EmployeeCreate(EmployeeBase):
+    pass
+
+
+class EmployeeUpdate(EmployeeBase):
+    pass
+
+
+class Employee(EmployeeBase):
+    id: int
+    salt: str
+    key: str
+
