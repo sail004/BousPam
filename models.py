@@ -14,6 +14,8 @@ class User(Base):
     passport_number = Column(String)
     snils = Column(String)
     inn = Column(String)
+    card_number = Column(String)
+    tg_id = Column(Integer)
 
 class Operation(Base):
     __tablename__ = "operations"
