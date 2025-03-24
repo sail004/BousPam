@@ -9,6 +9,7 @@ class UserBase(BaseModel):
     phone_number: str
     e_mail: str
     passport_number: str
+    card_number: str
     snils: str
     inn: str
 
@@ -18,7 +19,7 @@ class UserCreate(UserBase):
 
 
 class UserUpdate(UserBase):
-    pass
+    tg_id: int
 
 
 class User(UserBase):

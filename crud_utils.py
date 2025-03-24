@@ -39,6 +39,7 @@ def create_user(db: Session, user: schemas.UserCreate):
         surname=user.surname,
         balance=0.0,
         phone_number=user.phone_number,
+        card_number=user.card_number,
         )
     db.add(db_user)
     db.commit()
@@ -285,3 +286,19 @@ def delete_employee(db: Session, employee_id: int):
 
     db.delete(db_employee)
     db.commit()
+
+
+def get_user_by_tg_id(db: Session, tg_id: int):
+    return db.query(models.User).filter(models.User.tg_id == tg_id).first()
+
+
+def get_user_by_card_number(db: Session, card_number: str):
+    return db.query(models.User).filter(models.User.card_number == card_number).first()
+
+
+def set_user_tg_id(db: Session, tg_id: int, card_number: str):
+    db_user = get_user_by_card_number(db, card_number=card_number)
+    setattr(db_user, 'tg_id', tg_id)
+    db.add(db_user)
+    db.commit()
+    return 'success'
