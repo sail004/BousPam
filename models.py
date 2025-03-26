@@ -32,8 +32,8 @@ class Terminal(Base):
     __tablename__ = "terminals"
 
     id = Column(Integer, primary_key=True)
-    transport_company = Column(String)
-    price = Column(Integer)
+    company = Column(String)
+    fare = Column(Integer)
     hash = Column(String)
 
 class TransportCompany(Base):
@@ -57,3 +57,8 @@ class Employee(Base):
     date_of_birth = Column(String)
     phone_number = Column(String)
     role = Column(String)
+
+class TgObject:
+    card_number: str
+    balance: int
+    operations: list

@@ -48,7 +48,7 @@ def create_user(db: Session, user: schemas.UserCreate):
 
 
 def get_price_by_terminal_id(db: Session, terminal_id: int):
-    return get_terminal_by_id(db=db, terminal_id=terminal_id).price
+    return get_terminal_by_id(db=db, terminal_id=terminal_id).fare
 
 
 def create_operation_payment(db: Session, operation: schemas.OperationPaymentCreate, op_type: str):
@@ -122,8 +122,8 @@ def create_terminal(db: Session, terminal: schemas.TerminalCreate):
     random_string = ''.join(random.choices(string.ascii_letters + string.digits, k=8))
     hash = hashlib.pbkdf2_hmac('sha256', random_string.encode('utf-8'), os.urandom(32), 100000, dklen=128)
     db_term = models.Terminal(
-        transport_company=terminal.transport_company,
-        price=terminal.price,
+        company=terminal.company,
+        fare=terminal.fare,
         hash=hash.hex()
     )
     db.add(db_term)
@@ -155,7 +155,7 @@ def delete_terminal(db: Session, terminal_id: int):
 
 
 def get_terminals_by_company(db: Session, company_name: str):
-    return list(db.query(models.Terminal).filter(models.Terminal.transport_company == company_name))
+    return list(db.query(models.Terminal).filter(models.Terminal.company == company_name))
 
 
 def login_user(db: Session, phone_number: str, password: str):
@@ -302,3 +302,16 @@ def set_user_tg_id(db: Session, tg_id: int, card_number: str):
     db.add(db_user)
     db.commit()
     return 'success'
+
+
+def get_all_info_by_tg_id(db: Session, tg_id: int):
+    db_user = get_user_by_tg_id(db, tg_id=tg_id)
+    operations = get_operations_by_user_id(db, user_id=db_user.id)
+    card_number = db_user.card_number
+    balance = db_user.balance
+    re_object = {
+        "card_number": card_number,
+        "balance": balance,
+        "operations": operations
+    }
+    return re_object

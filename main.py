@@ -72,8 +72,10 @@ def read_user_by_id(user_id: int, db: Session = Depends(get_db)):
 def read_user_by_tg_id(tg_id: int, db: Session = Depends(get_db)):
     db_user = crud_utils.get_user_by_tg_id(db, tg_id=tg_id)
     if db_user is None:
-        raise HTTPException(status_code=404, detail=f"User with tg_id=\'{tg_id}\' not found")
-    return db_user
+        return {}
+        #raise HTTPException(status_code=404, detail=f"User with tg_id=\'{tg_id}\' not found")
+    info = crud_utils.get_all_info_by_tg_id(db, tg_id=tg_id)
+    return info
 
 
 @app.get("/tg/user/{card_number}") #, response_model=schemas.Product

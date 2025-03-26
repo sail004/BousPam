@@ -53,8 +53,8 @@ class OperationUpdate(OperationBase):
 
 
 class TerminalBase(BaseModel):
-    transport_company: str
-    price: int
+    company: str
+    fare: int
 
 
 class Terminal(TerminalBase):
