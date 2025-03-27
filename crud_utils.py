@@ -315,3 +315,6 @@ def get_all_info_by_tg_id(db: Session, tg_id: int):
         "operations": operations
     }
     return re_object
+
+def get_employee_by_login(db: Session, login: str):
+    return db.query(models.Employee).filter(models.Employee.login == login).first()

@@ -112,3 +112,6 @@ class Employee(EmployeeBase):
     salt: str
     key: str
 
+class GetWithParams(BaseModel):
+    skip: int
+    limit: int

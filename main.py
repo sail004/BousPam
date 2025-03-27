@@ -285,6 +285,9 @@ def delete_transport_company_by_id(tc_id: int, db: Session = Depends(get_db)):
 @app.post("/employee/") #, response_model=schemas.ProductCreate
 def create_employee(employee: schemas.EmployeeCreate, db: Session = Depends(get_db)):
     employee_exists = crud_utils.get_employee_by_phone_number(db, phone_number=employee.phone_number)
+    login_exists = crud_utils.get_employee_by_login(db, login=employee.login)
+    if login_exists is None:
+        return 'The employee with this login has already been registered'
     if employee_exists:
         return 'The employee with this number has already been registered'
     return crud_utils.create_employee(db=db, employee=employee).id
@@ -300,7 +303,7 @@ def read_employees(skip: int = 0, limit: int = 100, db: Session = Depends(get_db
 def login_employee(login: str, password: str, db: Session = Depends(get_db)):
     db_employee = crud_utils.login_employee(db, login=login, password=password)
     if db_employee == 'numb':
-        return 'Incorrect phone number'
+        return 'Incorrect login'
     if db_employee == 'inc':
         return 'Incorrect password'
     return db_employee
