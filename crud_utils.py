@@ -30,7 +30,7 @@ def get_user_by_phone_number(db: Session, phone_number: str):
 
 
 def get_users(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(models.User).all()
+    return db.query(models.User).offset(skip).limit(limit).all()
 
 
 def create_user(db: Session, user: schemas.UserCreate):
@@ -107,7 +107,7 @@ def delete_user(db: Session, user_id: int):
 
 
 def get_operations(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(models.Operation).all()
+    return db.query(models.Operation).offset(skip).limit(limit).all()
 
 
 def get_operations_by_terminal_id(db: Session, term_id: int):
@@ -133,7 +133,7 @@ def create_terminal(db: Session, terminal: schemas.TerminalCreate):
 
 
 def get_terminal_by_id(db: Session, terminal_id: int):
-    return db.query(models.Terminal).filter(models.Terminal.id == terminal_id).first()
+    return db.query(models.Terminal).filter(models.Terminal.terminal_id == terminal_id).first()
 
 
 def update_terminal(db: Session, term: schemas.TerminalUpdate, term_id: int):
@@ -214,11 +214,11 @@ def delete_transport_company(db: Session, tc_id: int):
 
 
 def get_transport_companies(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(models.TransportCompany).all()
+    return db.query(models.TransportCompany).offset(skip).limit(limit).all()
 
 
 def get_terminals(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(models.Terminal).all()
+    return db.query(models.Terminal).offset(skip).limit(limit).all()
 
 
 def create_employee(db: Session, employee: schemas.EmployeeCreate):
@@ -246,7 +246,7 @@ def get_employee_by_phone_number(db: Session, phone_number: str):
 
 
 def get_employees(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(models.Employee).all()
+    return db.query(models.Employee).offset(skip).limit(limit).all()
 
 
 def login_employee(db: Session, login: str, password: str):
@@ -315,6 +315,7 @@ def get_all_info_by_tg_id(db: Session, tg_id: int):
         "operations": operations
     }
     return re_object
+
 
 def get_employee_by_login(db: Session, login: str):
     return db.query(models.Employee).filter(models.Employee.login == login).first()

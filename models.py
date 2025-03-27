@@ -31,7 +31,7 @@ class Operation(Base):
 class Terminal(Base):
     __tablename__ = "terminals"
 
-    id = Column(Integer, primary_key=True)
+    terminal_id = Column(Integer, primary_key=True)
     company = Column(String)
     fare = Column(Integer)
     hash = Column(String)

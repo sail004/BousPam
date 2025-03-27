@@ -128,10 +128,10 @@ def read_operations(skip: int = 0, limit: int = 100, db: Session = Depends(get_d
 
 
 @app.get("/operations/{term_id}") #, response_model=schemas.Product
-def read_operations_by_terminal_id(term_id: int, db: Session = Depends(get_db)):
-    db_ops = crud_utils.get_operations_by_terminal_id(db, term_id=term_id)
+def read_operations_by_terminal_id(terminal_id: int, db: Session = Depends(get_db)):
+    db_ops = crud_utils.get_operations_by_terminal_id(db, term_id=terminal_id)
     if db_ops is None:
-        raise HTTPException(status_code=404, detail=f"Terminal with id=\'{term_id}\' not found")
+        raise HTTPException(status_code=404, detail=f"Terminal with id=\'{terminal_id}\' not found")
     return db_ops
 
 
@@ -202,10 +202,10 @@ def create_terminal(terminal: schemas.TerminalCreate, db: Session = Depends(get_
 
 
 @app.get("/terminal/{term_id}") #, response_model=schemas.Product
-def read_terminal_by_id(term_id: int, db: Session = Depends(get_db)):
-    db_term = crud_utils.get_terminal_by_id(db, terminal_id=term_id)
+def read_terminal_by_id(terminal_id: int, db: Session = Depends(get_db)):
+    db_term = crud_utils.get_terminal_by_id(db, terminal_id=terminal_id)
     if db_term is None:
-        raise HTTPException(status_code=404, detail=f"Terminal with id=\'{term_id}\' not found")
+        raise HTTPException(status_code=404, detail=f"Terminal with id=\'{terminal_id}\' not found")
     return db_term
 
 
@@ -224,19 +224,19 @@ def read_terminals_by_company_name(company_name: str, db: Session = Depends(get_
 
 
 @app.put("/terminal/{term_id}") #, response_model=schemas.Product
-def update_terminal_by_id(term_id: int, term: schemas.TerminalUpdate, db: Session = Depends(get_db)):
-    db_term = crud_utils.get_terminal_by_id(db, terminal_id=term_id)
+def update_terminal_by_id(terminal_id: int, term: schemas.TerminalUpdate, db: Session = Depends(get_db)):
+    db_term = crud_utils.get_terminal_by_id(db, terminal_id=terminal_id)
     if db_term is None:
-        raise HTTPException(status_code=404, detail=f"Terminal with id=\'{term_id}\' not found")
-    return crud_utils.update_terminal(db, term=term, term_id=term_id)
+        raise HTTPException(status_code=404, detail=f"Terminal with id=\'{terminal_id}\' not found")
+    return crud_utils.update_terminal(db, term=term, term_id=terminal_id)
 
 
 @app.delete("/terminal/{term_id}") #, response_model=dict
-def delete_terminal_by_id(term_id: int, db: Session = Depends(get_db)):
-    db_term = crud_utils.get_terminal_by_id(db, terminal_id=term_id)
+def delete_terminal_by_id(terminal_id: int, db: Session = Depends(get_db)):
+    db_term = crud_utils.get_terminal_by_id(db, terminal_id=terminal_id)
     if db_term is None:
-        raise HTTPException(status_code=404, detail=f"Terminal with id=\'{term_id}\' not found")
-    crud_utils.delete_terminal(db, terminal_id=term_id)
+        raise HTTPException(status_code=404, detail=f"Terminal with id=\'{terminal_id}\' not found")
+    crud_utils.delete_terminal(db, terminal_id=terminal_id)
 
     return {
         "status": "ok",

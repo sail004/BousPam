@@ -58,7 +58,7 @@ class TerminalBase(BaseModel):
 
 
 class Terminal(TerminalBase):
-    id: int
+    terminal_id: int
     hash: str
 
 
