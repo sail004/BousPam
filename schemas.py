@@ -53,7 +53,7 @@ class OperationUpdate(OperationBase):
 
 
 class TerminalBase(BaseModel):
-    company: str
+    company_name: str
     fare: int
 
 

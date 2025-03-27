@@ -195,9 +195,9 @@ def delete_user_by_id(user_id: int, db: Session = Depends(get_db)):
 
 @app.post("/terminal/") #, response_model=schemas.ProductCreate
 def create_terminal(terminal: schemas.TerminalCreate, db: Session = Depends(get_db)):
-    db_tc = crud_utils.get_transport_company_by_name(db, tc_name=terminal.transport_company)
+    db_tc = crud_utils.get_transport_company_by_name(db, tc_name=terminal.company_name)
     if db_tc is None:
-        raise HTTPException(status_code=404, detail=f"Transport company with name=\'{terminal.transport_company}\' not found")
+        raise HTTPException(status_code=404, detail=f"Transport company with name=\'{terminal.company_name}\' not found")
     return crud_utils.create_terminal(db=db, terminal=terminal)
 
 
