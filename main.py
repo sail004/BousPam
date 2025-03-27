@@ -336,3 +336,11 @@ def delete_employee_by_id(employee_id: int, db: Session = Depends(get_db)):
         "status": "ok",
         "message": "Deletion was successful"
     }
+
+
+@app.get("/tc/{tc_name}") #, response_model=schemas.Product
+def read_transport_company_by_name(company_name: str, db: Session = Depends(get_db)):
+    db_company = crud_utils.get_transport_company_by_name(db, tc_name=company_name)
+    if db_company is None:
+        raise HTTPException(status_code=404, detail=f"Company with name=\'{company_name}\' not found")
+    return db_company
