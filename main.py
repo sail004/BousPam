@@ -246,12 +246,12 @@ def delete_terminal_by_id(terminal_id: int, db: Session = Depends(get_db)):
 
 @app.post("/tc/") #, response_model=schemas.ProductCreate
 def create_transport_company(tc: schemas.TransportCompanyCreate, db: Session = Depends(get_db)):
-    db_owner_name = crud_utils.get_user_by_name(db, name=tc.owner_name)
-    if db_owner_name is None:
-        raise HTTPException(status_code=404, detail=f"User with name=\'{tc.owner_name}\' not found")
-    db_owner_surname = crud_utils.get_user_by_surname(db, surname=tc.owner_surname)
-    if db_owner_surname is None:
-        raise HTTPException(status_code=404, detail=f"User with surname=\'{tc.owner_surname}\' not found")
+    # db_owner_name = crud_utils.get_user_by_name(db, name=tc.owner_name)
+    # if db_owner_name is None:
+    #     raise HTTPException(status_code=404, detail=f"User with name=\'{tc.owner_name}\' not found")
+    # db_owner_surname = crud_utils.get_user_by_surname(db, surname=tc.owner_surname)
+    # if db_owner_surname is None:
+    #     raise HTTPException(status_code=404, detail=f"User with surname=\'{tc.owner_surname}\' not found")
     return crud_utils.create_transport_company(db=db, company=tc).id
 
 
