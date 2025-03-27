@@ -266,7 +266,15 @@ def update_transport_company_by_id(tc_id: int, tc: schemas.TransportCompanyUpdat
 @app.get("/tcs/") #, response_model=List[schemas.Product]
 def read_transport_companies(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     transport_companies = crud_utils.get_transport_companies(db, skip=skip, limit=limit)
-    return transport_companies
+    tc_joined = []
+    for company in transport_companies:
+        tc = {
+            "id": company.id,
+            "name": company.name,
+            "owner": company.owner_name + ' ' + company.owner_surname,
+        }
+        tc_joined.append(tc)
+    return tc_joined
 
 
 @app.delete("/tc/{tc_id}") #, response_model=dict
