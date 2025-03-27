@@ -294,7 +294,7 @@ def delete_transport_company_by_id(tc_id: int, db: Session = Depends(get_db)):
 def create_employee(employee: schemas.EmployeeCreate, db: Session = Depends(get_db)):
     employee_exists = crud_utils.get_employee_by_phone_number(db, phone_number=employee.phone_number)
     login_exists = crud_utils.get_employee_by_login(db, login=employee.login)
-    if login_exists is None:
+    if login_exists:
         return 'The employee with this login has already been registered'
     if employee_exists:
         return 'The employee with this number has already been registered'
