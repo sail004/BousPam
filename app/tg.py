@@ -29,20 +29,20 @@ def read_user_by_tg_id(tg_id: int, db: Session = Depends(get_db)):
     return info
 
 
-@tg_router.get("/read-user/card-number/") #, response_model=schemas.Product
-def read_user_by_card_number(card_number: str, db: Session = Depends(get_db)):
-    db_user = crud_utils.get_user_by_card_number(db, card_number=card_number)
+@tg_router.post("/read-user/card-number/") #, response_model=schemas.Product
+def read_user_by_card_number(card: schemas.Card, db: Session = Depends(get_db)):
+    db_user = crud_utils.get_user_by_card_number(db, card_number=card.number)
     if db_user is None:
-        raise HTTPException(status_code=404, detail=f"User with card_number=\'{card_number}\' not found")
+        raise HTTPException(status_code=404, detail=f"User with card_number=\'{card.number}\' not found")
     return db_user
 
 
 @tg_router.put("/user/set-tg-id/") #, response_model=schemas.Product
-def set_user_tg_id(card_number: str, tg_id: int, db: Session = Depends(get_db)):
-    db_user = crud_utils.get_user_by_card_number(db, card_number=card_number)
+def set_user_tg_id(card: schemas.Card, tg_id: int, db: Session = Depends(get_db)):
+    db_user = crud_utils.get_user_by_card_number(db, card_number=card.number)
     if db_user is None:
-        raise HTTPException(status_code=404, detail=f"User with card_number=\'{card_number}\' not found")
-    return crud_utils.set_user_tg_id(db, tg_id=tg_id, card_number=card_number)
+        return f"User with card_number=\'{card.number}\' not found"
+    return crud_utils.set_user_tg_id(db, tg_id=tg_id, card_number=card.number)
 
 
 @tg_router.get("/user/operations/") #, response_model=schemas.Product
