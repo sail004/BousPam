@@ -20,14 +20,14 @@ employee_router = APIRouter(prefix='/employee', tags=['Взаимодейств�
 
 
 @employee_router.post("/create/") #, response_model=schemas.ProductCreate
-def create_employee(employee: schemas.EmployeeCreate, db: Session = Depends(get_db)):
-    employee_exists = crud_utils.get_employee_by_phone_number(db, phone_number=employee.phone_number)
-    login_exists = crud_utils.get_employee_by_login(db, login=employee.login)
+async def create_employee(employee: schemas.EmployeeCreate, db: Session = Depends(get_db)):
+    employee_exists = await crud_utils.get_employee_by_phone_number(db, phone_number=employee.phone_number)
+    login_exists = await crud_utils.get_employee_by_login(db, login=employee.login)
     if login_exists:
         return 'The employee with this login has already been registered'
     if employee_exists:
         return 'The employee with this number has already been registered'
-    return crud_utils.create_employee(db=db, employee=employee).id
+    return await crud_utils.create_employee(db=db, employee=employee).id
 
 
 @employee_router.get("/get-list/") #, response_model=List[schemas.Product]

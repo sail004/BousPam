@@ -241,8 +241,12 @@ def create_employee(db: Session, employee: schemas.EmployeeCreate):
     return db_employee
 
 
-def get_employee_by_phone_number(db: Session, phone_number: str):
+async def get_employee_by_phone_number(db: Session, phone_number: str):
     return db.query(models.Employee).filter(models.Employee.phone_number == phone_number).first()
+
+
+async def get_employee_by_login(db: Session, login: str):
+    return db.query(models.Employee).filter(models.Employee.login == login).first()
 
 
 def get_employees(db: Session, skip: int = 0, limit: int = 100):
@@ -316,6 +320,3 @@ def get_all_info_by_tg_id(db: Session, tg_id: int):
     }
     return re_object
 
-
-def get_employee_by_login(db: Session, login: str):
-    return db.query(models.Employee).filter(models.Employee.login == login).first()

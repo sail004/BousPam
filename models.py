@@ -58,6 +58,14 @@ class Employee(Base):
     phone_number = Column(String)
     role = Column(String)
 
+class StopList(Base):
+    __tablename__ = "stoplist"
+
+    id = Column(Integer, primary_key=True)
+    card_number = Column(String)
+    owner_id = Column(Integer)
+    owner_phone_number = Column(String)
+
 class TgObject:
     card_number: str
     balance: int

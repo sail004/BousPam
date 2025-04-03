@@ -120,3 +120,20 @@ class Card(BaseModel):
 class Login(BaseModel):
     login: str
     password: str
+
+
+class StopListBase(BaseModel):
+    card_number: str
+
+
+class StopListCreate(UserBase):
+    owner_id: int
+    owner_phone_number: str
+
+
+class StopListUpdate(UserBase):
+    pass
+
+
+class StopList(UserBase):
+    id: int
