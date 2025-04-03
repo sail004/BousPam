@@ -320,3 +320,19 @@ def get_all_info_by_tg_id(db: Session, tg_id: int):
     }
     return re_object
 
+
+def get_card_from_stoplist(db: Session, card_number: str):
+    return db.query(models.StopList).filter(models.StopList.card_number == card_number).first()
+
+
+def is_in_stoplist(db: Session, card_number: str):
+    user = get_card_from_stoplist(db, card_number=card_number)
+    if user is None:
+        return False
+    return True
+
+
+def delete_from_stoplist(db: Session, card_number: int):
+    db_card = get_card_from_stoplist
+    db.delete(db_card)
+    db.commit()

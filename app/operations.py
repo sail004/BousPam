@@ -46,4 +46,7 @@ def replenishment_by_user_id(operation: schemas.OperationReplenishmentCreate, db
     db_user = crud_utils.get_user_by_id(db, user_id=operation.id_user)
     if db_user is None:
         raise HTTPException(status_code=404, detail=f"User with id=\'{operation.id_user}\' not found")
-    return crud_utils.create_operation_replenishment(db, operation, 'replenishment')
+    new_balance = crud_utils.create_operation_replenishment(db, operation, 'replenishment')
+    if new_balance > 0 and crud_utils.is_in_stoplist(db, db_user.card_number):
+        crud_utils.delete_from_stoplist(db, db_user.card_number)
+    return new_balance
