@@ -348,3 +348,7 @@ def delete_from_stoplist(db: Session, card_number: int):
     db_card = get_card_from_stoplist
     db.delete(db_card)
     db.commit()
+
+
+def get_stoplist(db: Session):
+    return db.query(models.StopList).all()

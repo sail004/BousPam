@@ -68,3 +68,8 @@ def delete_terminal_by_id(terminal_id: int, db: Session = Depends(get_db)):
         "status": "ok",
         "message": "Deletion was successful"
     }
+
+@terminal_router.get("/get-stoplist/") #, response_model=List[schemas.Product]
+def read_stoplist(db: Session = Depends(get_db)):
+    stoplist = crud_utils.get_stoplist(db)
+    return stoplist
