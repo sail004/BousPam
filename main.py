@@ -10,6 +10,7 @@ from app.company import company_router
 from app.users import user_router
 from app.terminals import terminal_router
 from app.operations import operations_router
+from app.tg import tg_router
 from database import SessionLocal, engine
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -42,3 +43,4 @@ app.include_router(operations_router)
 app.include_router(terminal_router)
 app.include_router(company_router)
 app.include_router(employee_router)
+app.include_router(tg_router)
