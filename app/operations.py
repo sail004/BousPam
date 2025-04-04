@@ -5,6 +5,7 @@ import os
 import crud_utils
 import models
 import schemas
+from crud_utils import add_to_stoplist
 from database import SessionLocal, engine
 
 
@@ -57,9 +58,14 @@ def payment_by_user_id(operation: schemas.OperationPaymentCreate, db: Session = 
     if delta_time < timedelta(minutes=1):
         if db_user.balance < abs(balance_change):
             raise HTTPException(status_code=400, detail=f"Insufficient funds to make the payment")
-        else:
-            return crud_utils.create_operation_payment(db, operation, 'payment')
-    return crud_utils.create_operation_payment(db, operation, 'payment')
+    new_balance = crud_utils.create_operation_payment(db, operation, 'payment')
+    if new_balance < 0:
+        add_to_stoplist(db, schemas.StopListCreate(
+            card_number=db_user.card_number,
+            owner_id=db_user.id,
+            owner_phone_number=db_user.phone_number
+        ))
+    return new_balance
 
 
 @operations_router.put("/replenishment/") #, response_model=schemas.Product
