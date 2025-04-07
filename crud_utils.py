@@ -7,6 +7,8 @@ import models
 import hashlib
 import os
 import schemas
+import services.luhn
+from services.luhn import set_luhn
 
 
 def get_user_by_id(db: Session, user_id: int):
@@ -352,3 +354,53 @@ def delete_from_stoplist(db: Session, card_number: int):
 
 def get_stoplist(db: Session):
     return db.query(models.StopList).all()
+
+
+def get_next_card_number(db: Session):
+    last_card = db.query(models.LastCardNumber).first()
+    card_number = last_card.card_number
+    new_card_number = str(int(card_number) + 1)
+    len_new = len(new_card_number)
+    if len_new < 9:
+        new_card_number = (9 - len_new) * ' ' + new_card_number
+    setattr(last_card, 'card_number', new_card_number)
+    db.add(last_card)
+    db.commit()
+    return set_luhn(new_card_number)
+
+
+def create_card(db: Session, card: schemas.CardCreate):
+    db_card = models.Card(
+        card_number=get_next_card_number(db),
+        owner_id=card.owner_id,
+    )
+    db.add(db_card)
+    db.commit()
+    db.refresh(db_card)
+    return db_card
+
+
+def get_cards(db: Session, skip: int = 0, limit: int = 100):
+    return db.query(models.Card).offset(skip).limit(limit).all()
+
+
+def get_card_by_id(db: Session, card_id: int):
+    return db.query(models.Card).filter(models.Card.id == card_id).first()
+
+
+def update_card(db: Session, card: schemas.CardUpdate, card_id: int):
+    db_card = get_card_by_id(db, card_id=card_id)
+    card_data = card.dict()
+
+    for key, value in card_data.items():
+        setattr(db_card, key, value)
+    db.add(db_card)
+    db.commit()
+    return db_card
+
+
+def delete_card(db: Session, card_id: int):
+    db_card = get_card_by_id(db, card_id=card_id)
+
+    db.delete(db_card)
+    db.commit()

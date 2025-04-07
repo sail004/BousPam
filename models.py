@@ -66,7 +66,15 @@ class StopList(Base):
     owner_id = Column(Integer)
     owner_phone_number = Column(String)
 
-class TgObject:
-    card_number: str
-    balance: int
-    operations: list
+class Card(Base):
+    __tablename__ = "cards"
+
+    id = Column(Integer, primary_key=True)
+    card_number = Column(String)
+    owner_id = Column(Integer)
+
+class LastCardNumber(Base):
+    __tablename__ = "lastcard_number"
+
+    id = Column(Integer, primary_key=True)
+    card_number = Column(String)

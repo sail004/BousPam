@@ -113,10 +113,6 @@ class Employee(EmployeeBase):
     key: str
 
 
-class Card(BaseModel):
-    number: str
-
-
 class Login(BaseModel):
     login: str
     password: str
@@ -137,3 +133,20 @@ class StopListUpdate(UserBase):
 
 class StopList(UserBase):
     id: int
+
+
+class CardBase(BaseModel):
+    owner_id: int
+
+
+class CardCreate(UserBase):
+    pass
+
+
+class CardUpdate(UserBase):
+    pass
+
+
+class Card(UserBase):
+    id: int
+    card_number: str
