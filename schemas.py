@@ -139,14 +139,14 @@ class CardBase(BaseModel):
     owner_id: int
 
 
-class CardCreate(UserBase):
+class CardCreate(CardBase):
     pass
 
 
-class CardUpdate(UserBase):
+class CardUpdate(CardBase):
     pass
 
 
-class Card(UserBase):
+class Card(CardBase):
     id: int
     card_number: str
