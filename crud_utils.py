@@ -375,9 +375,10 @@ async def get_next_card_number(db: Session):
         len_new = len(new_card_number)
         if len_new < 9:
             new_card_number = (9 - len_new) * ' ' + new_card_number
+        setattr(last_card, 'card_number', new_card_number)
     else:
         new_card_number = '100000000'
-    setattr(last_card, 'card_number', new_card_number)
+        last_card = models.LastCardNumber(card_number=new_card_number)
     db.add(last_card)
     db.commit()
     return await set_luhn(new_card_number)
