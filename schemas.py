@@ -4,12 +4,6 @@ from pydantic import BaseModel, Field, field_validator, ValidationError
 from datetime import datetime
 
 
-# class Role(Enum):
-#     ADMIN = 'administrator'
-#     CASHIER = 'cashier'
-#     OWNER = 'owner'
-
-
 class UserBase(BaseModel):
     name: str
     surname: str
@@ -79,10 +73,7 @@ class TerminalUpdate(TerminalBase):
 
 class TransportCompanyBase(BaseModel):
     name: str
-    owner_name: str
-    owner_surname: str
-    owner_number: str
-    owner_email: str
+    owner_id: int
 
 
 class TransportCompany(TransportCompanyBase):
@@ -173,7 +164,6 @@ class TCOwnerBase(BaseModel):
     surname: str
     password: str
     login: str
-    company_id: int
     phone_number: str
 
 
@@ -182,7 +172,7 @@ class TCOwnerCreate(TCOwnerBase):
 
 
 class TCOwnerUpdate(TCOwnerBase):
-    pass
+    company_id: int
 
 
 class TCOwner(TCOwnerBase):
@@ -191,7 +181,18 @@ class TCOwner(TCOwnerBase):
     key: str
 
 
-# class Role(StrEnum):
-#     ADMIN = 'administrator'
-#     CASHIER = 'cashier'
-#     OWNER = 'owner'
+class BusBase(BaseModel):
+    number: str
+    company_name: str
+
+
+class BusCreate(BusBase):
+    pass
+
+
+class BusUpdate(BusBase):
+    pass
+
+
+class Bus(BusBase):
+    id: int

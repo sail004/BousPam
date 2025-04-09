@@ -40,11 +40,8 @@ class TransportCompany(Base):
     __tablename__ = "transport_companies"
 
     id = Column(Integer, primary_key=True)
-    owner_name = Column(String)
-    owner_surname = Column(String)
-    owner_number = Column(String)
-    owner_email = Column(String)
     name = Column(String)
+    owner_id = Column(Integer)
 
 class Employee(Base):
     __tablename__ = "employees"
@@ -93,3 +90,10 @@ class TCOwner(Base):
     role = Column(String)
     phone_number = Column(String)
     company_id = Column(Integer)
+
+class Bus(Base):
+    __tablename__ = "Buses"
+
+    id = Column(Integer, primary_key=True)
+    number = Column(String)
+    company_name = Column(String)

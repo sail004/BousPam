@@ -181,10 +181,6 @@ async def login_user(db: Session, phone_number: str, password: str):
 async def create_transport_company(db: Session, company: schemas.TransportCompanyCreate):
     db_company = models.TransportCompany(
         name=company.name,
-        owner_name=company.owner_name,
-        owner_surname=company.owner_surname,
-        owner_email=company.owner_email,
-        owner_number=company.owner_number,
     )
     db.add(db_company)
     db.commit()
@@ -490,3 +486,47 @@ async def get_transport_company_income_by_id(db: Session, tc_id: int):
     for i in terminals:
         income += await get_income_by_terminal(db, term_id=i.terminal_id)
     return income
+
+
+async def create_bus(db: Session, bus: schemas.BusCreate):
+    db_bus = models.Bus(
+        number=bus.number,
+        company_name=bus.company_name
+    )
+    db.add(db_bus)
+    db.commit()
+    db.refresh(db_bus)
+    return db_bus.id
+
+
+async def get_bus_by_id(db: Session, bus_id: int) -> object:
+    return db.query(models.Bus).filter(models.Bus.id == bus_id).first()
+
+
+async def update_bus(db: Session, bus: schemas.BusUpdate, bus_id: int):
+    db_bus = await get_bus_by_id(db, bus_id=bus_id)
+    bus_data = bus.dict()
+
+    for key, value in bus_data.items():
+        setattr(db_bus, key, value)
+    db.add(db_bus)
+    db.commit()
+    return db_bus
+
+async def get_buses(db: Session, skip: int = 0, limit: int = 100):
+    return db.query(models.Bus).offset(skip).limit(limit).all()
+
+
+async def get_buses_by_company_name(db: Session, company_name: str):
+    return list(db.query(models.Bus).filter(models.Bus.company_name == company_name))
+
+
+async def delete_bus(db: Session, bus_id: int):
+    db_bus = await get_bus_by_id(db, bus_id=bus_id)
+
+    db.delete(db_bus)
+    db.commit()
+
+
+async def get_bus_by_number(db: Session, bus_number: str) -> object:
+    return db.query(models.Bus).filter(models.Bus.number == bus_number).first()
