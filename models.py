@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, String, Float, DateTime, ARRAY
+from sqlalchemy import Column, Integer, String, Float, DateTime
+from sqlalchemy.dialects.postgresql import ARRAY
 from database import Base
 
 
@@ -14,7 +15,7 @@ class User(Base):
     passport_number = Column(String)
     snils = Column(String)
     inn = Column(String)
-    card_number = Column(String)
+    cards = Column(ARRAY(String))
     tg_id = Column(Integer)
 
 class Operation(Base):

@@ -18,10 +18,23 @@ from app.buses import bus_router
 from app.routes import route_router
 from database import SessionLocal, engine
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.openapi.docs import get_swagger_ui_html
+
 
 models.Base.metadata.create_all(bind=engine)
 
-app = FastAPI()
+app = FastAPI(title='BousPam API')
+
+@app.get("/", include_in_schema=False)
+async def home():
+    return RedirectResponse("/docs")
+
+favicon_path = 'favicon.ico'
+@app.get('/favicon.ico', include_in_schema=False)
+async def favicon():
+    return FileResponse(favicon_path)
 
 app.add_middleware(
     CORSMiddleware,
@@ -31,6 +44,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.get("/docs", include_in_schema=False)
+async def swagger_ui_html():
+    return get_swagger_ui_html(
+        openapi_url="/openapi.json",
+        title="FastAPI",
+        swagger_favicon_url="/favicon.png"
+    )
 
 root = os.path.dirname(os.path.abspath(__file__))
 #app.mount("/static", StaticFiles(directory="static"), name="static")

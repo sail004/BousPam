@@ -27,7 +27,7 @@ async def read_user_by_tg_id(tg_id: int, db: Session = Depends(get_db)):
 
 
 @tg_router.post("/read-user/card-number/") #, response_model=schemas.Product
-async def read_user_by_card_number(card: schemas.Card, db: Session = Depends(get_db)):
+async def read_user_by_card_number(card: schemas.TgCard, db: Session = Depends(get_db)):
     db_user = await crud_utils.get_user_by_card_number(db, card_number=card.number)
     if db_user is None:
         raise HTTPException(status_code=404, detail=f"User with card_number=\'{card.number}\' not found")
@@ -35,7 +35,7 @@ async def read_user_by_card_number(card: schemas.Card, db: Session = Depends(get
 
 
 @tg_router.put("/user/set-tg-id/") #, response_model=schemas.Product
-async def set_user_tg_id(card: schemas.Card, tg_id: int, db: Session = Depends(get_db)):
+async def set_user_tg_id(card: schemas.TgCard, tg_id: int, db: Session = Depends(get_db)):
     db_user = await crud_utils.get_user_by_card_number(db, card_number=card.number)
     if db_user is None:
         return f"User with card_number=\'{card.number}\' not found"

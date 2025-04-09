@@ -22,4 +22,4 @@ async def set_luhn(number):
         else:
             summary += int(number[i])
     luhn = 10 - summary % 10
-    return number + str(luhn)
+    return number + str(luhn if luhn != 10 else 0)

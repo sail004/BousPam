@@ -10,7 +10,6 @@ class UserBase(BaseModel):
     phone_number: str
     e_mail: str
     passport_number: str
-    card_number: str
     snils: str
     inn: str
 
@@ -20,6 +19,7 @@ class UserCreate(UserBase):
 
 
 class UserUpdate(UserBase):
+    cards: list[str]
     tg_id: int
 
 
@@ -29,7 +29,7 @@ class User(UserBase):
     
 
 class OperationBase(BaseModel):
-    id_user: int
+    card_number: str
 
 
 class Operation(OperationBase):
@@ -217,3 +217,7 @@ class RouteUpdate(RouteBase):
 
 class Route(RouteBase):
     id: int
+
+
+class TgCard(BaseModel):
+    number: str

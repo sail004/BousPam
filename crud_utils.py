@@ -1,6 +1,7 @@
 from datetime import datetime
 from sqlalchemy.orm import Session
 from sqlalchemy.sql.functions import random
+from sqlalchemy.orm.attributes import flag_modified
 import string
 import random
 import models
@@ -40,8 +41,11 @@ async def create_user(db: Session, user: schemas.UserCreate):
         name=user.name,
         surname=user.surname,
         balance=0.0,
+        e_mail=user.e_mail,
+        snils=user.snils,
+        inn=user.inn,
+        passport_number=user.passport_number,
         phone_number=user.phone_number,
-        card_number=user.card_number,
         )
     db.add(db_user)
     db.commit()
@@ -54,12 +58,12 @@ async def get_price_by_terminal_id(db: Session, terminal_id: int):
     return terminal.fare
 
 
-async def create_operation_payment(db: Session, operation: schemas.OperationPaymentCreate, op_type: str):
+async def create_operation_payment(db: Session, operation: schemas.OperationPaymentCreate, op_type: str, user_id: int):
     price = await get_price_by_terminal_id(db=db, terminal_id=operation.id_terminal)
     db_operation = models.Operation(
         type=op_type,
         id_terminal=operation.id_terminal,
-        id_user=operation.id_user,
+        id_user=user_id,
         balance_change=-price,
         datetime=operation.request_time,
         terminal_hash=operation.terminal_hash
@@ -67,19 +71,19 @@ async def create_operation_payment(db: Session, operation: schemas.OperationPaym
     db.add(db_operation)
     db.commit()
     db.refresh(db_operation)
-    return await update_balance(db, operation.id_user, -price)
+    return await update_balance(db, user_id, -price)
 
 
-async def create_operation_replenishment(db: Session, operation: schemas.OperationReplenishmentCreate, op_type: str):
+async def create_operation_replenishment(db: Session, operation: schemas.OperationReplenishmentCreate, op_type: str, user_id: int):
     db_operation = models.Operation(
         type=op_type,
-        id_user=operation.id_user,
+        id_user=user_id,
         balance_change=operation.balance_change,
         datetime=datetime.now())
     db.add(db_operation)
     db.commit()
     db.refresh(db_operation)
-    return await update_balance(db, operation.id_user, operation.balance_change)
+    return await update_balance(db, user_id, operation.balance_change)
 
 
 async def update_user(db: Session, user: schemas.UserUpdate, user_id: int):
@@ -306,11 +310,11 @@ async def get_user_by_tg_id(db: Session, tg_id: int):
 
 
 async def get_user_by_card_number(db: Session, card_number: str):
-    return db.query(models.User).filter(models.User.card_number == card_number).first()
+    return db.query(models.User).filter(models.User.cards.contains([card_number])).first()
 
 
 async def set_user_tg_id(db: Session, tg_id: int, card_number: str):
-    db_user = get_user_by_card_number(db, card_number=card_number)
+    db_user = await get_user_by_card_number(db, card_number=card_number)
     setattr(db_user, 'tg_id', tg_id)
     db.add(db_user)
     db.commit()
@@ -384,11 +388,21 @@ async def create_card(db: Session, card: schemas.CardCreate):
     db.add(db_card)
     db.commit()
     db.refresh(db_card)
-    return db_card
+    db_user = await get_user_by_id(db, card.owner_id)
+    cards = db_user.cards if db_user.cards else []
+    cards.append(db_card.card_number)
+    db_user.cards = cards
+    flag_modified(db_user, 'cards')
+    db.commit()
+    return db_card.card_number
 
 
 async def get_cards(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.Card).offset(skip).limit(limit).all()
+
+
+async def get_card_by_number(db: Session, card_number: str):
+    return db.query(models.Card).filter(models.Card.card_number == card_number).first()
 
 
 async def get_card_by_id(db: Session, card_id: int):
