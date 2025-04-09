@@ -295,15 +295,15 @@ def delete_employee(db: Session, employee_id: int):
     db.commit()
 
 
-def get_user_by_tg_id(db: Session, tg_id: int):
+async def get_user_by_tg_id(db: Session, tg_id: int):
     return db.query(models.User).filter(models.User.tg_id == tg_id).first()
 
 
-def get_user_by_card_number(db: Session, card_number: str):
+async def get_user_by_card_number(db: Session, card_number: str):
     return db.query(models.User).filter(models.User.card_number == card_number).first()
 
 
-def set_user_tg_id(db: Session, tg_id: int, card_number: str):
+async def set_user_tg_id(db: Session, tg_id: int, card_number: str):
     db_user = get_user_by_card_number(db, card_number=card_number)
     setattr(db_user, 'tg_id', tg_id)
     db.add(db_user)
@@ -311,9 +311,9 @@ def set_user_tg_id(db: Session, tg_id: int, card_number: str):
     return 'success'
 
 
-def get_all_info_by_tg_id(db: Session, tg_id: int):
-    db_user = get_user_by_tg_id(db, tg_id=tg_id)
-    operations = get_operations_by_user_id(db, user_id=db_user.id)
+async def get_all_info_by_tg_id(db: Session, tg_id: int):
+    db_user = await get_user_by_tg_id(db, tg_id=tg_id)
+    operations = await get_operations_by_user_id(db, user_id=db_user.id)
     card_number = db_user.card_number
     balance = db_user.balance
     re_object = {
