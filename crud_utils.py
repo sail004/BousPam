@@ -369,11 +369,14 @@ async def get_stoplist(db: Session):
 
 async def get_next_card_number(db: Session):
     last_card = db.query(models.LastCardNumber).first()
-    card_number = last_card.card_number
-    new_card_number = str(int(card_number) + 1)
-    len_new = len(new_card_number)
-    if len_new < 9:
-        new_card_number = (9 - len_new) * ' ' + new_card_number
+    if last_card:
+        card_number = last_card.card_number
+        new_card_number = str(int(card_number) + 1)
+        len_new = len(new_card_number)
+        if len_new < 9:
+            new_card_number = (9 - len_new) * ' ' + new_card_number
+    else:
+        new_card_number = '100000000'
     setattr(last_card, 'card_number', new_card_number)
     db.add(last_card)
     db.commit()
