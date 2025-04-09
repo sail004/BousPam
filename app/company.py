@@ -46,6 +46,7 @@ async def read_transport_companies(skip: int = 0, limit: int = 100, db: Session 
         tc = {
             "id": company.id,
             "name": company.name,
+            "owner_number": company.owner_number,
             "owner": company.owner_name + ' ' + company.owner_surname,
         }
         tc_joined.append(tc)
