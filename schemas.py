@@ -1,6 +1,13 @@
 from __future__ import annotations
+from enum import Enum
 from pydantic import BaseModel
 from datetime import datetime
+
+
+class Role(Enum):
+    ADMIN = 'administrator'
+    CASHIER = 'cashier'
+    OWNER = 'owner'
 
 
 class UserBase(BaseModel):
@@ -94,7 +101,7 @@ class EmployeeBase(BaseModel):
     name: str
     surname: str
     password: str
-    role: str
+    role: Role
     login: str
     gender: str
     date_of_birth: str
@@ -175,3 +182,9 @@ class TCOwner(TCOwnerBase):
     id: int
     salt: str
     key: str
+
+
+class Role(Enum):
+    ADMIN = 'administrator'
+    CASHIER = 'cashier'
+    OWNER = 'owner'

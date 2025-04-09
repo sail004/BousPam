@@ -90,5 +90,6 @@ class TCOwner(Base):
     login = Column(String)
     key = Column(String)
     salt = Column(String)
+    role = Column(String)
     phone_number = Column(String)
     company_id = Column(Integer)
