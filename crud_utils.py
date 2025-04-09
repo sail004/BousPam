@@ -120,7 +120,7 @@ def get_operations_by_user_id(db: Session, user_id: int):
     return list(db.query(models.Operation).filter(models.Operation.id_user == user_id))
 
 
-def create_terminal(db: Session, terminal: schemas.TerminalCreate):
+async def create_terminal(db: Session, terminal: schemas.TerminalCreate):
     random_string = ''.join(random.choices(string.ascii_letters + string.digits, k=8))
     hash = hashlib.pbkdf2_hmac('sha256', random_string.encode('utf-8'), os.urandom(32), 100000, dklen=128)
     db_term = models.Terminal(
@@ -134,12 +134,12 @@ def create_terminal(db: Session, terminal: schemas.TerminalCreate):
     return db_term
 
 
-def get_terminal_by_id(db: Session, terminal_id: int):
+async def get_terminal_by_id(db: Session, terminal_id: int):
     return db.query(models.Terminal).filter(models.Terminal.terminal_id == terminal_id).first()
 
 
-def update_terminal(db: Session, term: schemas.TerminalUpdate, term_id: int):
-    db_term = get_terminal_by_id(db, terminal_id=term_id)
+async def update_terminal(db: Session, term: schemas.TerminalUpdate, term_id: int):
+    db_term = await get_terminal_by_id(db, terminal_id=term_id)
     term_data = term.dict()
 
     for key, value in term_data.items():
@@ -149,14 +149,14 @@ def update_terminal(db: Session, term: schemas.TerminalUpdate, term_id: int):
     return db_term
 
 
-def delete_terminal(db: Session, terminal_id: int):
-    db_term = get_terminal_by_id(db, terminal_id=terminal_id)
+async def delete_terminal(db: Session, terminal_id: int):
+    db_term = await get_terminal_by_id(db, terminal_id=terminal_id)
 
     db.delete(db_term)
     db.commit()
 
 
-def get_terminals_by_company(db: Session, company_name: str):
+async def get_terminals_by_company(db: Session, company_name: str):
     return list(db.query(models.Terminal).filter(models.Terminal.company == company_name))
 
 
@@ -193,7 +193,7 @@ def get_transport_company_by_id(db: Session, tc_id: int) -> object:
     return db.query(models.TransportCompany).filter(models.TransportCompany.id == tc_id).first()
 
 
-def get_transport_company_by_name(db: Session, tc_name: str) -> object:
+async def get_transport_company_by_name(db: Session, tc_name: str) -> object:
     return db.query(models.TransportCompany).filter(models.TransportCompany.name == tc_name).first()
 
 
@@ -352,7 +352,7 @@ def delete_from_stoplist(db: Session, card_number: int):
     db.commit()
 
 
-def get_stoplist(db: Session):
+async def get_stoplist(db: Session):
     return db.query(models.StopList).all()
 
 
