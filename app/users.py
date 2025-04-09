@@ -16,7 +16,7 @@ def get_db():
         db.close()
 
 
-user_router = APIRouter(prefix='/users', tags=['Работа с пользователями'])
+user_router = APIRouter(prefix='/users', tags=['Interaction with users'])
 
 
 @user_router.post("/registration/") #, response_model=schemas.ProductCreate

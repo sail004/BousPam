@@ -513,6 +513,7 @@ async def update_bus(db: Session, bus: schemas.BusUpdate, bus_id: int):
     db.commit()
     return db_bus
 
+
 async def get_buses(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.Bus).offset(skip).limit(limit).all()
 
@@ -530,3 +531,41 @@ async def delete_bus(db: Session, bus_id: int):
 
 async def get_bus_by_number(db: Session, bus_number: str) -> object:
     return db.query(models.Bus).filter(models.Bus.number == bus_number).first()
+
+
+async def create_route(db: Session, route: schemas.RouteCreate):
+    db_route = models.Route(
+        transport_company=route.transport_company,
+        name = route.name,
+        stops = route.stops,
+    )
+    db.add(db_route)
+    db.commit()
+    db.refresh(db_route)
+    return db_route.id
+
+
+async def get_route_by_id(db: Session, route_id: int):
+    return db.query(models.Route).filter(models.Route.id == route_id).first()
+
+
+async def update_route(db: Session, route: schemas.RouteUpdate, route_id: int):
+    db_route = await get_route_by_id(db, route_id=route_id)
+    route_data = route.dict()
+
+    for key, value in route_data.items():
+        setattr(db_route, key, value)
+    db.add(db_route)
+    db.commit()
+    return db_route
+
+
+async def delete_route(db: Session, route_id: int):
+    db_route = await get_route_by_id(db, route_id=route_id)
+
+    db.delete(db_route)
+    db.commit()
+
+
+async def get_route_by_name(db: Session, route_name: str):
+    return db.query(models.Route).filter(models.Route.name == route_name).first()

@@ -17,7 +17,7 @@ def get_db():
         db.close()
 
 
-operations_router = APIRouter(prefix='/operations', tags=['Работа с операциями'])
+operations_router = APIRouter(prefix='/operations', tags=['Interaction with transactions'])
 
 
 @operations_router.get("/getlist/") #, response_model=List[schemas.Product]

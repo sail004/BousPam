@@ -16,7 +16,7 @@ def get_db():
         db.close()
 
 
-owner_router = APIRouter(prefix='/carrier', tags=['Взаимодействие с владельцами ТК'])
+owner_router = APIRouter(prefix='/carrier', tags=['Interaction with carriers'])
 
 
 @owner_router.post("/create/") #, response_model=schemas.ProductCreate

@@ -16,7 +16,7 @@ def get_db():
         db.close()
 
 
-card_router = APIRouter(prefix='/card', tags=['Взаимодействие с картами'])
+card_router = APIRouter(prefix='/card', tags=['Interaction with cards'])
 
 
 @card_router.post("/create/") #, response_model=schemas.ProductCreate

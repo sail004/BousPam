@@ -15,6 +15,7 @@ from app.cards import card_router
 from app.tc_owner import owner_router
 from app.default import login_router
 from app.buses import bus_router
+from app.routes import route_router
 from database import SessionLocal, engine
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -53,3 +54,4 @@ app.include_router(tg_router)
 app.include_router(card_router)
 app.include_router(owner_router)
 app.include_router(bus_router)
+app.include_router(route_router)

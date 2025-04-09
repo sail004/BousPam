@@ -196,3 +196,21 @@ class BusUpdate(BusBase):
 
 class Bus(BusBase):
     id: int
+
+
+class RouteBase(BaseModel):
+    transport_company: str
+    name: str
+    stops: list[str]
+
+
+class RouteCreate(RouteBase):
+    pass
+
+
+class RouteUpdate(RouteBase):
+    pass
+
+
+class Route(RouteBase):
+    id: int

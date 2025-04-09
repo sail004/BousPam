@@ -13,7 +13,7 @@ def get_db():
         db.close()
 
 
-tg_router = APIRouter(prefix='/tg', tags=['Взаимодействие с telegram mini app'])
+tg_router = APIRouter(prefix='/tg', tags=['Interaction with telegram mini app'])
 
 
 @tg_router.get("/read-user/tg-id/") #, response_model=schemas.Product

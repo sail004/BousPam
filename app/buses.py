@@ -19,12 +19,12 @@ def get_db():
 bus_router = APIRouter(prefix='/buses', tags=['Interaction with buses'])
 
 
-@bus_router.post("/bus/") #, response_model=schemas.ProductCreate
+@bus_router.post("/create/") #, response_model=schemas.ProductCreate
 async def create_bus(bus: schemas.BusCreate, db: Session = Depends(get_db)):
     return await crud_utils.create_bus(db=db, bus=bus)
 
 
-@bus_router.put("/bus/{bus_id}") #, response_model=schemas.Product
+@bus_router.put("/update/") #, response_model=schemas.Product
 async def update_bus_by_id(bus_id: int, bus: schemas.BusUpdate, db: Session = Depends(get_db)):
     db_bus = await crud_utils.get_bus_by_id(db, bus_id=bus_id)
     if db_bus is None:
@@ -32,7 +32,7 @@ async def update_bus_by_id(bus_id: int, bus: schemas.BusUpdate, db: Session = De
     return await crud_utils.update_bus(db, bus=bus, bus_id=bus_id)
 
 
-@bus_router.get("/bus/{bus_number}") #, response_model=schemas.Product
+@bus_router.get("/get-by-number/") #, response_model=schemas.Product
 async def read_bus_by_number(bus_number: str, db: Session = Depends(get_db)):
     db_bus = await crud_utils.get_bus_by_number(db, bus_number=bus_number)
     if db_bus is None:
@@ -40,13 +40,7 @@ async def read_bus_by_number(bus_number: str, db: Session = Depends(get_db)):
     return db_bus
 
 
-@bus_router.get("/buses/") #, response_model=List[schemas.Product]
-async def read_buses(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    buses = await crud_utils.get_buses(db, skip=skip, limit=limit)
-    return buses
-
-
-@bus_router.get("/buses/{company_name}") #, response_model=schemas.Product
+@bus_router.get("/get-by-company-name/") #, response_model=schemas.Product
 async def read_buses_by_company_name(company_name: str, db: Session = Depends(get_db)):
     db_buses = await crud_utils.get_buses_by_company_name(db, company_name=company_name)
     if db_buses is None:
@@ -54,7 +48,13 @@ async def read_buses_by_company_name(company_name: str, db: Session = Depends(ge
     return db_buses
 
 
-@bus_router.delete("/bus/{bus_id}") #, response_model=dict
+@bus_router.get("/get-list/") #, response_model=List[schemas.Product]
+async def read_buses(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    buses = await crud_utils.get_buses(db, skip=skip, limit=limit)
+    return buses
+
+
+@bus_router.delete("/delete/") #, response_model=dict
 async def delete_bus_by_id(bus_id: int, db: Session = Depends(get_db)):
     db_bus = await crud_utils.get_bus_by_id(db, bus_id=bus_id)
     if db_bus is None:

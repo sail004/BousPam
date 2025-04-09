@@ -97,3 +97,11 @@ class Bus(Base):
     id = Column(Integer, primary_key=True)
     number = Column(String)
     company_name = Column(String)
+
+class Route(Base):
+    __tablename__ = "routes"
+
+    id = Column(Integer, primary_key=True)
+    transport_company = Column(String)
+    name = Column(String)
+    stops = Column(ARRAY(String))

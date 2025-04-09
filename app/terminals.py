@@ -16,7 +16,7 @@ def get_db():
         db.close()
 
 
-terminal_router = APIRouter(prefix='/terminals', tags=['Взаимодействие с терминалами'])
+terminal_router = APIRouter(prefix='/terminals', tags=['Interaction with terminals'])
 
 
 @terminal_router.post("/create/") #, response_model=schemas.ProductCreate
