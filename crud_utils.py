@@ -177,7 +177,7 @@ def login_user(db: Session, phone_number: str, password: str):
     return 'inc'
 
 
-def create_transport_company(db: Session, company: schemas.TransportCompanyCreate):
+async def create_transport_company(db: Session, company: schemas.TransportCompanyCreate):
     db_company = models.TransportCompany(
         name=company.name,
         owner_name=company.owner_name,
@@ -186,10 +186,10 @@ def create_transport_company(db: Session, company: schemas.TransportCompanyCreat
     db.add(db_company)
     db.commit()
     db.refresh(db_company)
-    return db_company
+    return db_company.id
 
 
-def get_transport_company_by_id(db: Session, tc_id: int) -> object:
+async def get_transport_company_by_id(db: Session, tc_id: int) -> object:
     return db.query(models.TransportCompany).filter(models.TransportCompany.id == tc_id).first()
 
 
@@ -197,8 +197,8 @@ async def get_transport_company_by_name(db: Session, tc_name: str) -> object:
     return db.query(models.TransportCompany).filter(models.TransportCompany.name == tc_name).first()
 
 
-def update_transport_company(db: Session, company: schemas.TransportCompanyUpdate, tc_id: int):
-    db_company = get_transport_company_by_id(db, tc_id=tc_id)
+async def update_transport_company(db: Session, company: schemas.TransportCompanyUpdate, tc_id: int):
+    db_company = await get_transport_company_by_id(db, tc_id=tc_id)
     company_data = company.dict()
 
     for key, value in company_data.items():
@@ -208,14 +208,14 @@ def update_transport_company(db: Session, company: schemas.TransportCompanyUpdat
     return db_company
 
 
-def delete_transport_company(db: Session, tc_id: int):
-    db_company = get_transport_company_by_id(db, tc_id=tc_id)
+async def delete_transport_company(db: Session, tc_id: int):
+    db_company = await get_transport_company_by_id(db, tc_id=tc_id)
 
     db.delete(db_company)
     db.commit()
 
 
-def get_transport_companies(db: Session, skip: int = 0, limit: int = 100):
+async def get_transport_companies(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.TransportCompany).offset(skip).limit(limit).all()
 
 
