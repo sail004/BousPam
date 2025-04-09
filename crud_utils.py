@@ -357,7 +357,7 @@ async def get_stoplist(db: Session):
     return db.query(models.StopList).all()
 
 
-def get_next_card_number(db: Session):
+async def get_next_card_number(db: Session):
     last_card = db.query(models.LastCardNumber).first()
     card_number = last_card.card_number
     new_card_number = str(int(card_number) + 1)
@@ -367,12 +367,12 @@ def get_next_card_number(db: Session):
     setattr(last_card, 'card_number', new_card_number)
     db.add(last_card)
     db.commit()
-    return set_luhn(new_card_number)
+    return await set_luhn(new_card_number)
 
 
-def create_card(db: Session, card: schemas.CardCreate):
+async def create_card(db: Session, card: schemas.CardCreate):
     db_card = models.Card(
-        card_number=get_next_card_number(db),
+        card_number= await get_next_card_number(db),
         owner_id=card.owner_id,
     )
     db.add(db_card)
@@ -381,16 +381,16 @@ def create_card(db: Session, card: schemas.CardCreate):
     return db_card
 
 
-def get_cards(db: Session, skip: int = 0, limit: int = 100):
+async def get_cards(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.Card).offset(skip).limit(limit).all()
 
 
-def get_card_by_id(db: Session, card_id: int):
+async def get_card_by_id(db: Session, card_id: int):
     return db.query(models.Card).filter(models.Card.id == card_id).first()
 
 
-def update_card(db: Session, card: schemas.CardUpdate, card_id: int):
-    db_card = get_card_by_id(db, card_id=card_id)
+async def update_card(db: Session, card: schemas.CardUpdate, card_id: int):
+    db_card = await get_card_by_id(db, card_id=card_id)
     card_data = card.dict()
 
     for key, value in card_data.items():
@@ -400,7 +400,7 @@ def update_card(db: Session, card: schemas.CardUpdate, card_id: int):
     return db_card
 
 
-def delete_card(db: Session, card_id: int):
+async def delete_card(db: Session, card_id: int):
     db_card = get_card_by_id(db, card_id=card_id)
 
     db.delete(db_card)

@@ -1,4 +1,4 @@
-def check(number):
+async def check(number):
     summary = 0
     for i in range(10):
         if i % 2 == 0:
@@ -11,7 +11,7 @@ def check(number):
     return summary % 10 == 0
 
 
-def set_luhn(number):
+async def set_luhn(number):
     summary = 0
     for i in range(9):
         if i % 2 == 0:
