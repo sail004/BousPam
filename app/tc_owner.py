@@ -79,6 +79,15 @@ async def login_transport_company_owner(auth_data: schemas.Login, db: Session = 
     return db_tc_owner
 
 
+@owner_router.get("/get-company/") #, response_model=schemas.Product
+async def read_transport_company_by_owner(owner_id: int, db: Session = Depends(get_db)):
+    db_tc_owner = await crud_utils.get_transport_company_owner_by_id(db, owner_id=owner_id)
+    if db_tc_owner is None:
+        raise HTTPException(status_code=404, detail=f"Owner with id=\'{owner_id}\' not found")
+    db_company = await crud_utils.get_transport_company_by_id(db, tc_id=db_tc_owner.company_id)
+    return db_company
+
+
 @owner_router.delete("/delete/") #, response_model=dict
 async def delete_transport_company_owner_by_id(owner_id: int, db: Session = Depends(get_db)):
     db_tc_owner = await crud_utils.get_transport_company_owner_by_id(db, owner_id=owner_id)
