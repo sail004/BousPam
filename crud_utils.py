@@ -49,12 +49,13 @@ async def create_user(db: Session, user: schemas.UserCreate):
     return db_user.id
 
 
-def get_price_by_terminal_id(db: Session, terminal_id: int):
-    return get_terminal_by_id(db=db, terminal_id=terminal_id).fare
+async def get_price_by_terminal_id(db: Session, terminal_id: int):
+    terminal = await get_terminal_by_id(db=db, terminal_id=terminal_id)
+    return terminal.fare
 
 
-def create_operation_payment(db: Session, operation: schemas.OperationPaymentCreate, op_type: str):
-    price = get_price_by_terminal_id(db=db, terminal_id=operation.id_terminal)
+async def create_operation_payment(db: Session, operation: schemas.OperationPaymentCreate, op_type: str):
+    price = await get_price_by_terminal_id(db=db, terminal_id=operation.id_terminal)
     db_operation = models.Operation(
         type=op_type,
         id_terminal=operation.id_terminal,
@@ -66,10 +67,10 @@ def create_operation_payment(db: Session, operation: schemas.OperationPaymentCre
     db.add(db_operation)
     db.commit()
     db.refresh(db_operation)
-    return update_balance(db, operation.id_user, -price)
+    return await update_balance(db, operation.id_user, -price)
 
 
-def create_operation_replenishment(db: Session, operation: schemas.OperationReplenishmentCreate, op_type: str):
+async def create_operation_replenishment(db: Session, operation: schemas.OperationReplenishmentCreate, op_type: str):
     db_operation = models.Operation(
         type=op_type,
         id_user=operation.id_user,
@@ -78,7 +79,7 @@ def create_operation_replenishment(db: Session, operation: schemas.OperationRepl
     db.add(db_operation)
     db.commit()
     db.refresh(db_operation)
-    return update_balance(db, operation.id_user, operation.balance_change)
+    return await update_balance(db, operation.id_user, operation.balance_change)
 
 
 async def update_user(db: Session, user: schemas.UserUpdate, user_id: int):
@@ -108,15 +109,15 @@ async def delete_user(db: Session, user_id: int):
     db.commit()
 
 
-def get_operations(db: Session, skip: int = 0, limit: int = 100):
+async def get_operations(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.Operation).offset(skip).limit(limit).all()
 
 
-def get_operations_by_terminal_id(db: Session, term_id: int):
+async def get_operations_by_terminal_id(db: Session, term_id: int):
     return list(db.query(models.Operation).filter(models.Operation.id_terminal == term_id))
 
 
-def get_operations_by_user_id(db: Session, user_id: int):
+async def get_operations_by_user_id(db: Session, user_id: int):
     return list(db.query(models.Operation).filter(models.Operation.id_user == user_id))
 
 
@@ -323,7 +324,7 @@ def get_all_info_by_tg_id(db: Session, tg_id: int):
     return re_object
 
 
-def add_to_stoplist(db: Session, stoplist: schemas.StopListCreate):
+async def add_to_stoplist(db: Session, stoplist: schemas.StopListCreate):
     db_card = models.StopList(
         card_number=stoplist.card_number,
         owner_id=stoplist.owner_id,
@@ -335,19 +336,19 @@ def add_to_stoplist(db: Session, stoplist: schemas.StopListCreate):
     return db_card
 
 
-def get_card_from_stoplist(db: Session, card_number: str):
+async def get_card_from_stoplist(db: Session, card_number: str):
     return db.query(models.StopList).filter(models.StopList.card_number == card_number).first()
 
 
-def is_in_stoplist(db: Session, card_number: str):
-    user = get_card_from_stoplist(db, card_number=card_number)
+async def is_in_stoplist(db: Session, card_number: str):
+    user = await get_card_from_stoplist(db, card_number=card_number)
     if user is None:
         return False
     return True
 
 
-def delete_from_stoplist(db: Session, card_number: int):
-    db_card = get_card_from_stoplist
+async def delete_from_stoplist(db: Session, card_number: str):
+    db_card = await get_card_from_stoplist(db, card_number=card_number)
     db.delete(db_card)
     db.commit()
 
