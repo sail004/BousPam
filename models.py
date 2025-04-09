@@ -41,6 +41,9 @@ class TransportCompany(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String)
+    owner_name = Column(String)
+    owner_surname = Column(String)
+    owner_number = Column(String)
     owner_id = Column(Integer)
 
 class Employee(Base):

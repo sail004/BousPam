@@ -179,13 +179,21 @@ async def login_user(db: Session, phone_number: str, password: str):
 
 
 async def create_transport_company(db: Session, company: schemas.TransportCompanyCreate):
+    db_owner = await get_transport_company_owner_by_id(db, owner_id=company.owner_id)
     db_company = models.TransportCompany(
         name=company.name,
+        owner_name=db_owner.name,
+        owner_surname=db_owner.surname,
+        owner_number=db_owner.phone_number,
     )
     db.add(db_company)
     db.commit()
     db.refresh(db_company)
-    return db_company.id
+    id = db_company.id
+    setattr(db_owner, 'company_id', db_company.id)
+    db.add(db_owner)
+    db.commit()
+    return id
 
 
 async def get_transport_company_by_id(db: Session, tc_id: int) -> object:

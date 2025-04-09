@@ -78,6 +78,9 @@ class TransportCompanyBase(BaseModel):
 
 class TransportCompany(TransportCompanyBase):
     id: int
+    owner_name: int
+    owner_surname: int
+    owner_number: str
 
 
 class TransportCompanyCreate(TransportCompanyBase):
