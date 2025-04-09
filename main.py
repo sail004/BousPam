@@ -20,12 +20,12 @@ from database import SessionLocal, engine
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.responses import HTMLResponse, RedirectResponse
-from fastapi.openapi.docs import get_swagger_ui_html
-
+from fastapi.openapi.docs import get_swagger_ui_html, get_redoc_html
 
 models.Base.metadata.create_all(bind=engine)
 
-app = FastAPI(title='BousPam API')
+root = os.path.dirname(os.path.abspath(__file__))
+app = FastAPI(title='BousPam API', docs_url=None)
 
 @app.get("/", include_in_schema=False)
 async def home():
@@ -45,14 +45,14 @@ app.add_middleware(
 )
 
 @app.get("/docs", include_in_schema=False)
-async def swagger_ui_html():
+async def overriden_swagger():
     return get_swagger_ui_html(
         openapi_url="/openapi.json",
         title="FastAPI",
-        swagger_favicon_url="/favicon.png"
+        swagger_favicon_url="favicon.ico"
     )
 
-root = os.path.dirname(os.path.abspath(__file__))
+
 #app.mount("/static", StaticFiles(directory="static"), name="static")
 
 #@app.get("/login/") #, response_model=List[schemas.Product]
