@@ -415,7 +415,6 @@ async def create_transport_company_owner(db: Session, owner: schemas.TCOwnerCrea
         salt=salt.hex(),
         key=key.hex(),
         phone_number=owner.phone_number,
-        company_id=owner.company_id,
         role='Owner',
         )
     db.add(db_tc_owner)
