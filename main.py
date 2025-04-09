@@ -56,7 +56,7 @@ async def login(auth_data: schemas.Login, db: Session = Depends(get_db)):
         return 'Incorrect login'
     if db_employee == 'inc' or db_tc_owner == 'inc':
         return 'Incorrect password'
-    return db_employee if type(db_employee) == object else db_tc_owner
+    return db_employee if type(db_employee) != str else db_tc_owner
 
 app.include_router(user_router)
 app.include_router(operations_router)

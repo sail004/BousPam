@@ -420,7 +420,7 @@ async def create_transport_company_owner(db: Session, owner: schemas.TCOwnerCrea
         key=key.hex(),
         phone_number=owner.phone_number,
         company_id=owner.company_id,
-        role=schemas.Role.OWNER,
+        role='Owner',
         )
     db.add(db_tc_owner)
     db.commit()
