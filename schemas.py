@@ -74,6 +74,8 @@ class TransportCompanyBase(BaseModel):
     name: str
     owner_name: str
     owner_surname: str
+    owner_number: str
+    owner_email: str
 
 
 class TransportCompany(TransportCompanyBase):
@@ -122,16 +124,16 @@ class StopListBase(BaseModel):
     card_number: str
 
 
-class StopListCreate(UserBase):
+class StopListCreate(StopListBase):
     owner_id: int
     owner_phone_number: str
 
 
-class StopListUpdate(UserBase):
+class StopListUpdate(StopListBase):
     pass
 
 
-class StopList(UserBase):
+class StopList(StopListBase):
     id: int
 
 
@@ -150,3 +152,26 @@ class CardUpdate(CardBase):
 class Card(CardBase):
     id: int
     card_number: str
+
+
+class TCOwnerBase(BaseModel):
+    name: str
+    surname: str
+    password: str
+    login: str
+    company_id: int
+    phone_number: str
+
+
+class TCOwnerCreate(TCOwnerBase):
+    pass
+
+
+class TCOwnerUpdate(TCOwnerBase):
+    pass
+
+
+class TCOwner(TCOwnerBase):
+    id: int
+    salt: str
+    key: str

@@ -19,11 +19,11 @@ async def get_balance_by_id(db: Session, user_id: int):
     return db.query(models.User).filter(models.User.id == user_id).first().balance
 
 
-def get_user_by_name(db: Session, name: str):
+async def get_user_by_name(db: Session, name: str):
     return db.query(models.User).filter(models.User.name == name).first()
 
 
-def get_user_by_surname(db: Session, surname: str):
+async def get_user_by_surname(db: Session, surname: str):
     return db.query(models.User).filter(models.User.surname == surname).first()
 
 
@@ -161,7 +161,7 @@ async def get_terminals_by_company(db: Session, company_name: str):
     return list(db.query(models.Terminal).filter(models.Terminal.company == company_name))
 
 
-def login_user(db: Session, phone_number: str, password: str):
+async def login_user(db: Session, phone_number: str, password: str):
     user = db.query(models.User).filter(models.User.phone_number == phone_number).first()
     if user is None:
         return 'numb'
@@ -182,7 +182,9 @@ async def create_transport_company(db: Session, company: schemas.TransportCompan
     db_company = models.TransportCompany(
         name=company.name,
         owner_name=company.owner_name,
-        owner_surname=company.owner_surname
+        owner_surname=company.owner_surname,
+        owner_email=company.owner_email,
+        owner_number=company.owner_number,
     )
     db.add(db_company)
     db.commit()
@@ -220,11 +222,11 @@ async def get_transport_companies(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.TransportCompany).offset(skip).limit(limit).all()
 
 
-def get_terminals(db: Session, skip: int = 0, limit: int = 100):
+async def get_terminals(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.Terminal).offset(skip).limit(limit).all()
 
 
-def create_employee(db: Session, employee: schemas.EmployeeCreate):
+async def create_employee(db: Session, employee: schemas.EmployeeCreate):
     salt = os.urandom(32)
     key = hashlib.pbkdf2_hmac('sha256', employee.password.encode('utf-8'), salt, 100000, dklen=128)
     db_employee = models.Employee(
@@ -241,7 +243,7 @@ def create_employee(db: Session, employee: schemas.EmployeeCreate):
     db.add(db_employee)
     db.commit()
     db.refresh(db_employee)
-    return db_employee
+    return db_employee.id
 
 
 async def get_employee_by_phone_number(db: Session, phone_number: str):
@@ -252,11 +254,11 @@ async def get_employee_by_login(db: Session, login: str):
     return db.query(models.Employee).filter(models.Employee.login == login).first()
 
 
-def get_employees(db: Session, skip: int = 0, limit: int = 100):
+async def get_employees(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.Employee).offset(skip).limit(limit).all()
 
 
-def login_employee(db: Session, login: str, password: str):
+async def login_employee(db: Session, login: str, password: str):
     employee = db.query(models.Employee).filter(models.Employee.login == login).first()
     if employee is None:
         return 'numb'
@@ -273,12 +275,12 @@ def login_employee(db: Session, login: str, password: str):
     return 'inc'
 
 
-def get_employee_by_id(db: Session, employee_id: int):
+async def get_employee_by_id(db: Session, employee_id: int):
     return db.query(models.Employee).filter(models.Employee.id == employee_id).first()
 
 
-def update_employee(db: Session, employee: schemas.EmployeeUpdate, employee_id: int):
-    db_employee = get_employee_by_id(db, employee_id=employee_id)
+async def update_employee(db: Session, employee: schemas.EmployeeUpdate, employee_id: int):
+    db_employee = await get_employee_by_id(db, employee_id=employee_id)
     employee_data = employee.dict()
 
     for key, value in employee_data.items():
@@ -288,7 +290,7 @@ def update_employee(db: Session, employee: schemas.EmployeeUpdate, employee_id: 
     return db_employee
 
 
-def delete_employee(db: Session, employee_id: int):
+async def delete_employee(db: Session, employee_id: int):
     db_employee = get_employee_by_id(db, employee_id=employee_id)
 
     db.delete(db_employee)
@@ -405,3 +407,85 @@ async def delete_card(db: Session, card_id: int):
 
     db.delete(db_card)
     db.commit()
+
+
+async def create_transport_company_owner(db: Session, owner: schemas.TCOwnerCreate):
+    salt = os.urandom(32)
+    key = hashlib.pbkdf2_hmac('sha256', owner.password.encode('utf-8'), salt, 100000, dklen=128)
+    db_tc_owner = models.TCOwner(
+        name=owner.name,
+        surname=owner.surname,
+        login=owner.login,
+        salt=salt.hex(),
+        key=key.hex(),
+        phone_number=owner.phone_number,
+        company_id=owner.company_id
+        )
+    db.add(db_tc_owner)
+    db.commit()
+    db.refresh(db_tc_owner)
+    return db_tc_owner.id
+
+
+async def get_transport_company_owner_by_id(db: Session, owner_id: int):
+    return db.query(models.TCOwner).filter(models.TCOwner.id == owner_id).first()
+
+
+async def update_transport_company_owner(db: Session, owner: schemas.TCOwnerUpdate, owner_id: int):
+    db_owner = await get_transport_company_owner_by_id(db, owner_id=owner_id)
+    owner_data = owner.dict()
+
+    for key, value in owner_data.items():
+        setattr(db_owner, key, value)
+    db.add(db_owner)
+    db.commit()
+    return db_owner
+
+
+async def get_transport_companies_owners(db: Session, skip: int = 0, limit: int = 100):
+    return db.query(models.TCOwner).offset(skip).limit(limit).all()
+
+
+async def get_transport_company_owner_by_name(db: Session, owner_name: str):
+    return db.query(models.TCOwner).filter(models.TCOwner.name == owner_name).first()
+
+
+async def login_transport_company_owner(db: Session, login: str, password: str):
+    db_tc_owner = db.query(models.TCOwner).filter(models.TCOwner.login == login).first()
+    if db_tc_owner is None:
+        return 'numb'
+    salt = bytes.fromhex(db_tc_owner.salt)
+    key = bytes.fromhex(db_tc_owner.key)
+    new_key = hashlib.pbkdf2_hmac(
+        'sha256',
+        password.encode('utf-8'),
+        salt,
+        100000,
+        dklen=128)
+    if new_key == key:
+        return db_tc_owner
+    return 'inc'
+
+
+async def delete_transport_company_owner(db: Session, owner_id: int):
+    db_tc_owner = await get_transport_company_owner_by_id(db, owner_id=owner_id)
+
+    db.delete(db_tc_owner)
+    db.commit()
+
+
+async def get_income_by_terminal(db: Session, term_id: int):
+    income = 0
+    operations = await get_operations_by_terminal_id(db, term_id)
+    for i in operations:
+        income -= i.balance_change
+    return income
+
+
+async def get_transport_company_income_by_id(db: Session, tc_id: int):
+    company = await get_transport_company_by_id(db, tc_id=tc_id)
+    terminals = await get_terminals_by_company(db, company.name)
+    income = 0
+    for i in terminals:
+        income += await get_income_by_terminal(db, term_id=i.terminal_id)
+    return income

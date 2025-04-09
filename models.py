@@ -42,6 +42,8 @@ class TransportCompany(Base):
     id = Column(Integer, primary_key=True)
     owner_name = Column(String)
     owner_surname = Column(String)
+    owner_number = Column(String)
+    owner_email = Column(String)
     name = Column(String)
 
 class Employee(Base):
@@ -78,3 +80,15 @@ class LastCardNumber(Base):
 
     id = Column(Integer, primary_key=True)
     card_number = Column(String)
+
+class TCOwner(Base):
+    __tablename__ = "tc_owners"
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String)
+    surname = Column(String)
+    login = Column(String)
+    key = Column(String)
+    salt = Column(String)
+    phone_number = Column(String)
+    company_id = Column(Integer)

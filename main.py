@@ -12,6 +12,7 @@ from app.terminals import terminal_router
 from app.operations import operations_router
 from app.tg import tg_router
 from app.cards import card_router
+from app.tc_owner import owner_router
 from database import SessionLocal, engine
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -46,3 +47,4 @@ app.include_router(company_router)
 app.include_router(employee_router)
 app.include_router(tg_router)
 app.include_router(card_router)
+app.include_router(owner_router)
