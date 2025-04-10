@@ -44,7 +44,7 @@ async def read_operations_by_user_id(user_id: int, db: Session = Depends(get_db)
 
 
 @operations_router.put("/payment/") #, response_model=schemas.Product
-async def payment_by_user_id(operation: schemas.OperationPaymentCreate, db: Session = Depends(get_db)):
+async def payment_by_card_number(operation: schemas.OperationPaymentCreate, db: Session = Depends(get_db)):
     db_card = await crud_utils.get_card_by_number(db, card_number=operation.card_number)
     db_terminal = await crud_utils.get_terminal_by_id(db, terminal_id=operation.id_terminal)
     if db_terminal is None:
