@@ -184,6 +184,8 @@ async def login_user(db: Session, phone_number: str, password: str):
 
 async def create_transport_company(db: Session, company: schemas.TransportCompanyCreate):
     db_owner = await get_transport_company_owner_by_id(db, owner_id=company.owner_id)
+    if not db_owner:
+        return f'Owner with id=\'{company.owner_id}\' does not exist'
     db_company = models.TransportCompany(
         name=company.name,
         owner_name=db_owner.name,
