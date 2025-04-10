@@ -73,7 +73,7 @@ async def payment_by_user_id(operation: schemas.OperationPaymentCreate, db: Sess
 @operations_router.put("/replenishment/") #, response_model=schemas.Product
 async def replenishment_by_card_number(operation: schemas.OperationReplenishmentCreate, db: Session = Depends(get_db)):
     db_card = await crud_utils.get_card_by_number(db, operation.card_number)
-    if not services.luhn.check(operation.card_number):
+    if not await services.luhn.check(operation.card_number):
         return "Incorrect card number"
     if db_card is None:
         return f"Card with number=\'{operation.card_number}\' not found"
