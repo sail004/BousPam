@@ -1,6 +1,6 @@
 async def check(number):
     summary = 0
-    for i in range(10):
+    for i in range(len(number)):
         if i % 2 == 0:
             buffer = int(number[i]) * 2
             if buffer > 9:
