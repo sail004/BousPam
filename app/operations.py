@@ -5,6 +5,7 @@ import os
 import crud_utils
 import models
 import schemas
+import services.luhn
 from crud_utils import add_to_stoplist
 from database import SessionLocal, engine
 
@@ -72,9 +73,13 @@ async def payment_by_user_id(operation: schemas.OperationPaymentCreate, db: Sess
 @operations_router.put("/replenishment/") #, response_model=schemas.Product
 async def replenishment_by_card_number(operation: schemas.OperationReplenishmentCreate, db: Session = Depends(get_db)):
     db_card = await crud_utils.get_card_by_number(db, operation.card_number)
+    if not services.luhn.check(operation.card_number):
+        return "Incorrect card number"
+    if db_card is None:
+        return f"Card with number=\'{operation.card_number}\' not found"
     db_user = await crud_utils.get_user_by_id(db, user_id=db_card.owner_id)
     if db_user is None:
-        raise HTTPException(status_code=404, detail=f"User with id=\'{operation.id_user}\' not found")
+        raise HTTPException(status_code=404, detail=f"User with id=\'{db_card.owner_id}\' not found")
     new_balance = await crud_utils.create_operation_replenishment(db, operation, 'replenishment', db_card.owner_id)
     if new_balance > 0 and await crud_utils.is_in_stoplist(db, operation.card_number):
         await crud_utils.delete_from_stoplist(db, operation.card_number)
