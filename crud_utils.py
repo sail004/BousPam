@@ -565,6 +565,8 @@ async def create_route(db: Session, route: schemas.RouteCreate):
         transport_company=route.transport_company,
         name = route.name,
         stops = route.stops,
+        terminal_id = route.terminal_id,
+        bus_number = route.bus_number,
     )
     db.add(db_route)
     db.commit()

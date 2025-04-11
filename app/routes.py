@@ -5,6 +5,7 @@ import os
 import crud_utils
 import models
 import schemas
+from crud_utils import get_bus_by_number, get_terminal_by_id
 from database import SessionLocal, engine
 
 
@@ -21,6 +22,15 @@ route_router = APIRouter(prefix='/route', tags=['Interaction with routes'])
 
 @route_router.post("/create/") #, response_model=schemas.ProductCreate
 async def create_route(route: schemas.RouteCreate, db: Session = Depends(get_db)):
+    company = await crud_utils.get_transport_company_by_name(db, tc_name=route.transport_company)
+    if company is None:
+        return f"Transport company with name \'{route.transport_company}\' not found"
+    bus = await get_bus_by_number(db, route.bus_number)
+    if bus is None:
+        return f"Bus with number {route.bus_number} not found"
+    terminal = await get_terminal_by_id(db, route.terminal_id)
+    if terminal is None:
+        return f"Terminal with id={route.terminal_id} not found"
     return await crud_utils.create_route(db=db, route=route)
 
 

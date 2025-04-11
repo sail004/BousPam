@@ -205,6 +205,15 @@ class RouteBase(BaseModel):
     transport_company: str
     name: str
     stops: list[str]
+    terminal_id: int
+    bus_number: str
+
+    @field_validator('stops')
+    @classmethod
+    def validate_stops(cls, values):
+        if len(values) < 2:
+            raise ValueError("Should be at least 2 stops")
+        return values
 
 
 class RouteCreate(RouteBase):

@@ -109,3 +109,5 @@ class Route(Base):
     transport_company = Column(String)
     name = Column(String)
     stops = Column(ARRAY(String))
+    terminal_id = Column(Integer)
+    bus_number = Column(String)
