@@ -51,3 +51,17 @@ async def read_route_by_route_name(route_name: str, db: Session = Depends(get_db
     if db_route is None:
         raise HTTPException(status_code=404, detail=f"Route with name=\'{route_name}\' not found")
     return db_route
+
+
+@route_router.get("/getlist-by-company-name/") #, response_model=schemas.Product
+async def read_routes_by_company_name(company_name: str, db: Session = Depends(get_db)):
+    db_routes = await crud_utils.get_routes_by_company_name(db, company_name=company_name)
+    if db_routes is None:
+        raise HTTPException(status_code=404, detail=f"Route owned by the сompany with name=\'{company_name}\' not found")
+    return db_routes
+
+
+@route_router.get("/get-list/") #, response_model=List[schemas.Product]
+async def read_routes(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    db_routes = await crud_utils.get_routes(db, skip=skip, limit=limit)
+    return db_routes

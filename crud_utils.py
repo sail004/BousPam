@@ -596,3 +596,11 @@ async def delete_route(db: Session, route_id: int):
 
 async def get_route_by_name(db: Session, route_name: str):
     return db.query(models.Route).filter(models.Route.name == route_name).first()
+
+
+async def get_routes_by_company_name(db: Session, company_name: str):
+    return list(db.query(models.Route).filter(models.Route.transport_company == company_name))
+
+
+async def get_routes(db: Session, skip: int = 0, limit: int = 100):
+    return db.query(models.Route).offset(skip).limit(limit).all()
