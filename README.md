@@ -16,7 +16,7 @@
 
 https://docs.google.com/document/d/1bLdJ6N0NoRJVeuj4-CrVBRfTTMlaB0O1HGZYbT126BQ/edit?tab=t.0#heading=h.ui646w88c7v7
 
-<h1 align="center">Документация(устарела)</h1>
+<h1 align="center">Документация</h1>
 
 ## База данных:
 
