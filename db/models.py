@@ -62,6 +62,7 @@ class Employee(Base):
     date_of_birth = Column(String)
     phone_number = Column(String)
     role = Column(String)
+    tg_id = Column(String)
 
 class StopList(Base):
     __tablename__ = "stoplist"
@@ -96,6 +97,7 @@ class TCOwner(Base):
     role = Column(String)
     phone_number = Column(String)
     company_id = Column(Integer)
+    tg_id = Column(String)
 
 class Bus(Base):
     __tablename__ = "Buses"

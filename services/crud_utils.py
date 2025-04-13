@@ -325,13 +325,29 @@ async def set_user_tg_id(db: Session, tg_id: int, card_number: str):
     return 'success'
 
 
+async def set_employee_tg_id(db: Session, info: schemas.SetTgId):
+    db_employee = await get_employee_by_id(db, employee_id=info.entity_id)
+    setattr(db_employee, 'tg_id', info.tg_id)
+    db.add(db_employee)
+    db.commit()
+    return 'success'
+
+
+async def set_transport_company_owner_tg_id(db: Session, info: schemas.SetTgId):
+    db_tc_owner = await get_employee_by_id(db, employee_id=info.entity_id)
+    setattr(db_tc_owner, 'tg_id', info.tg_id)
+    db.add(db_tc_owner)
+    db.commit()
+    return 'success'
+
+
 async def get_all_info_by_tg_id(db: Session, tg_id: int):
     db_user = await get_user_by_tg_id(db, tg_id=tg_id)
     operations = await get_operations_by_user_id(db, user_id=db_user.id)
-    card_number = db_user.card_number
+    card_numbers = db_user.cards
     balance = db_user.balance
     re_object = {
-        "card_number": card_number,
+        "card_number": card_numbers,
         "balance": balance,
         "operations": operations
     }
@@ -677,8 +693,10 @@ async def check_operations(db: Session, cashbox_info: schemas.CheckOperations):
         last_discrepancy = await get_last_discrepancy(db, cashbox_info.cashbox_number)
         if last_discrepancy:
             if discrepancy - last_discrepancy > 0 or discrepancy - last_discrepancy < 0:
-                await create_discrepancy(db, last_check.cashier_id, cashbox_info.cashbox_number, discrepancy - last_discrepancy)
+                await create_discrepancy(db, last_check.cashier_id, cashbox_info.cashbox_number,
+                                         discrepancy - last_discrepancy)
         else:
             await create_discrepancy(db, last_check.cashier_id, cashbox_info.cashbox_number,
                                      discrepancy - last_discrepancy)
-    await create_last_check(db, fact_balance, cashbox_info.cashbox_number, cashbox_info.cashbox_balance, cashbox_info.cashier_id)
+    await create_last_check(db, fact_balance, cashbox_info.cashbox_number, cashbox_info.cashbox_balance,
+                            cashbox_info.cashier_id)
