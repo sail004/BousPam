@@ -1,13 +1,9 @@
-from datetime import datetime, timedelta, timezone
-from fastapi import Depends, FastAPI, HTTPException, APIRouter
+from datetime import datetime, timedelta
+from fastapi import Depends, HTTPException, APIRouter
 from sqlalchemy.orm import Session
-import os
-import crud_utils
-import models
-import schemas
+from services import crud_utils, schemas
 import services.luhn
-from crud_utils import add_to_stoplist
-from database import SessionLocal, engine
+from db.database import SessionLocal
 
 
 def get_db():
@@ -84,3 +80,11 @@ async def replenishment_by_card_number(operation: schemas.OperationReplenishment
     if new_balance > 0 and await crud_utils.is_in_stoplist(db, operation.card_number):
         await crud_utils.delete_from_stoplist(db, operation.card_number)
     return new_balance
+
+
+@operations_router.put("/check-operations/") #, response_model=schemas.Product
+async def check_operations(cashbox: schemas.CheckOperations, db: Session = Depends(get_db)):
+    db_cashier = await crud_utils.get_employee_by_id(db, cashbox.cashier_id)
+    if db_cashier is None:
+        raise HTTPException(status_code=404, detail=f"Employee with id=\'{cashbox.cashier_id}\' not found")
+    await crud_utils.check_operations(db, cashbox)

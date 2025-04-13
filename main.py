@@ -1,10 +1,6 @@
-from datetime import datetime, timedelta, timezone
-from fastapi import Depends, FastAPI, HTTPException, APIRouter
-from sqlalchemy.orm import Session
+from fastapi import FastAPI
 import os
-import crud_utils
-import models
-import schemas
+from db import models
 from app.employee import employee_router
 from app.company import company_router
 from app.users import user_router
@@ -16,11 +12,11 @@ from app.tc_owner import owner_router
 from app.default import login_router
 from app.buses import bus_router
 from app.routes import route_router
-from database import SessionLocal, engine
+from db.database import engine
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
-from fastapi.responses import HTMLResponse, RedirectResponse
-from fastapi.openapi.docs import get_swagger_ui_html, get_redoc_html
+from fastapi.responses import RedirectResponse
+from fastapi.openapi.docs import get_swagger_ui_html
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -31,7 +27,7 @@ app = FastAPI(title='BousPam API', docs_url=None)
 async def home():
     return RedirectResponse("/docs")
 
-favicon_path = 'favicon.ico'
+favicon_path = 'static/favicon.ico'
 @app.get('/favicon.ico', include_in_schema=False)
 async def favicon():
     return FileResponse(favicon_path)
@@ -49,20 +45,9 @@ async def overriden_swagger():
     return get_swagger_ui_html(
         openapi_url="/openapi.json",
         title="FastAPI",
-        swagger_favicon_url="favicon.ico"
+        swagger_favicon_url=favicon_path
     )
 
-
-#app.mount("/static", StaticFiles(directory="static"), name="static")
-
-#@app.get("/login/") #, response_model=List[schemas.Product]
-#def login_user(phone_number: str, password: str, db: Session = Depends(get_db)):
-#    db_user = crud_utils.login_user(db, phone_number=phone_number, password=password)
-#    if db_user == 'numb':
-#        return 'Incorrect phone number'
-#    if db_user == 'inc':
-#        return 'Incorrect password'
-#    return db_user
 
 app.include_router(login_router)
 app.include_router(user_router)
@@ -70,7 +55,7 @@ app.include_router(operations_router)
 app.include_router(terminal_router)
 app.include_router(company_router)
 app.include_router(employee_router)
-# app.include_router(tg_router)
+app.include_router(tg_router)
 app.include_router(card_router)
 app.include_router(owner_router)
 app.include_router(bus_router)

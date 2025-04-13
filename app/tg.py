@@ -1,8 +1,7 @@
-from fastapi import Depends, FastAPI, HTTPException, APIRouter
+from fastapi import Depends, HTTPException, APIRouter
 from sqlalchemy.orm import Session
-import crud_utils
-import schemas
-from database import SessionLocal, engine
+from services import crud_utils, schemas
+from db.database import SessionLocal
 
 
 def get_db():

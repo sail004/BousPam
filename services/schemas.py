@@ -46,6 +46,8 @@ class OperationPaymentCreate(OperationBase):
 
 
 class OperationReplenishmentCreate(OperationBase):
+    cashier_id: int
+    cashbox_number: int
     balance_change: float
 
 
@@ -187,6 +189,8 @@ class TCOwner(TCOwnerBase):
 class BusBase(BaseModel):
     number: str
     company_name: str
+    terminal_id: int
+    route: str
 
 
 class BusCreate(BusBase):
@@ -230,3 +234,9 @@ class Route(RouteBase):
 
 class TgCard(BaseModel):
     number: str
+
+
+class CheckOperations(BaseModel):
+    cashier_id: int
+    cashbox_number: int
+    cashbox_balance: float

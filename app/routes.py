@@ -1,12 +1,8 @@
-from datetime import datetime, timedelta, timezone
-from fastapi import Depends, FastAPI, HTTPException, APIRouter
+from fastapi import Depends, HTTPException, APIRouter
 from sqlalchemy.orm import Session
-import os
-import crud_utils
-import models
-import schemas
-from crud_utils import get_bus_by_number, get_terminal_by_id
-from database import SessionLocal, engine
+from services import crud_utils, schemas
+from services.crud_utils import get_bus_by_number, get_terminal_by_id
+from db.database import SessionLocal
 
 
 def get_db():

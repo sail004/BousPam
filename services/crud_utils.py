@@ -4,11 +4,10 @@ from sqlalchemy.sql.functions import random
 from sqlalchemy.orm.attributes import flag_modified
 import string
 import random
-import models
+from db import models
 import hashlib
 import os
-import schemas
-import services.luhn
+from services import schemas
 from services.luhn import set_luhn
 
 
@@ -79,7 +78,10 @@ async def create_operation_replenishment(db: Session, operation: schemas.Operati
         type=op_type,
         id_user=user_id,
         balance_change=operation.balance_change,
-        datetime=datetime.now())
+        datetime=datetime.now(),
+        cashier_id=operation.cashier_id,
+        cashbox_number=operation.cashbox_number,
+    )
     db.add(db_operation)
     db.commit()
     db.refresh(db_operation)
@@ -518,7 +520,9 @@ async def get_transport_company_income_by_id(db: Session, tc_id: int):
 async def create_bus(db: Session, bus: schemas.BusCreate):
     db_bus = models.Bus(
         number=bus.number,
-        company_name=bus.company_name
+        company_name=bus.company_name,
+        terminal_id=bus.terminal_id,
+        route=bus.route,
     )
     db.add(db_bus)
     db.commit()
@@ -606,3 +610,75 @@ async def get_routes_by_company_name(db: Session, company_name: str):
 
 async def get_routes(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.Route).offset(skip).limit(limit).all()
+
+
+async def create_discrepancy(db: Session, cashier_id: int, cashbox_number: int, discrepancy: float):
+    db_discrepancy = models.Discrepancy(
+        date=datetime.now(),
+        cashier_id = cashier_id,
+        cashbox_number = cashbox_number,
+        discrepancy = discrepancy,
+    )
+    db.add(db_discrepancy)
+    db.commit()
+    db.refresh(db_discrepancy)
+
+
+async def create_last_check(db: Session, fact_balance: float, cashbox_number: int, cashier_balance: float, cashier_id: int):
+    db_last_check = models.LastCashCheck(
+        datetime=datetime.now(),
+        cashier_id=cashier_id,
+        cashbox_number=cashbox_number,
+        fact_balance=fact_balance,
+        cashier_balance=cashier_balance,
+    )
+    db.add(db_last_check)
+    db.commit()
+    db.refresh(db_last_check)
+
+
+async def get_last_discrepancy(db: Session, cashbox_number: int):
+    db_discrepancy = (db.query(models.Discrepancy)
+                      .filter(models.Discrepancy.cashbox_number == cashbox_number)
+                      .order_by(models.Discrepancy.id.desc()).first())
+    if db_discrepancy:
+        return db_discrepancy.discrepancy
+    return None
+
+
+async def check_operations(db: Session, cashbox_info: schemas.CheckOperations):
+    start_fact = 0
+    start_cashier = 0
+    now = datetime.now()
+    last_check = db.query(models.LastCashCheck).filter(
+        models.LastCashCheck.cashbox_number == cashbox_info.cashbox_number
+    ).first()
+    if last_check:
+        start_fact = last_check.fact_balance
+        start_cashier = last_check.cashier_balance
+        delta_time = datetime.now - last_check.datetime
+
+        operations = list(db.query(models.Operation).filter(
+            models.Operation.cashbox_number == cashbox_info.cashbox_number,
+            models.Operation.cashier_id == cashbox_info.cashier_id,
+            (now - models.Operation.datetime) < delta_time
+        ))
+    else:
+        operations = list(db.query(models.Operation).filter(
+            models.Operation.cashbox_number == cashbox_info.cashbox_number,
+            models.Operation.cashier_id == cashbox_info.cashier_id
+        ))
+    fact_balance = start_fact
+    if operations:
+        for i in operations:
+            fact_balance += i.balance_change
+    if fact_balance != cashbox_info.cashbox_balance:
+        discrepancy = cashbox_info.cashbox_balance - fact_balance
+        last_discrepancy = await get_last_discrepancy(db, cashbox_info.cashbox_number)
+        if last_discrepancy:
+            if discrepancy - last_discrepancy > 0 or discrepancy - last_discrepancy < 0:
+                await create_discrepancy(db, last_check.cashier_id, cashbox_info.cashbox_number, discrepancy - last_discrepancy)
+        else:
+            await create_discrepancy(db, last_check.cashier_id, cashbox_info.cashbox_number,
+                                     discrepancy - last_discrepancy)
+    await create_last_check(db, fact_balance, cashbox_info.cashbox_number, cashbox_info.cashbox_balance, cashbox_info.cashier_id)

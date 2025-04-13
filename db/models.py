@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, Float, DateTime
 from sqlalchemy.dialects.postgresql import ARRAY
-from database import Base
+from db.database import Base
 
 
 class User(Base):
@@ -13,8 +13,8 @@ class User(Base):
     balance = Column(Float)
     e_mail = Column(String)
     passport_number = Column(String)
-    snils = Column(String)
-    inn = Column(String)
+    niu = Column(String)
+    nif = Column(String)
     cards = Column(ARRAY(String))
     tg_id = Column(Integer)
 
@@ -28,6 +28,8 @@ class Operation(Base):
     type = Column(String)
     balance_change = Column(Float)
     datetime = Column(DateTime)
+    cashier_id = Column(Integer)
+    cashbox_number = Column(Integer)
 
 class Terminal(Base):
     __tablename__ = "terminals"
@@ -101,6 +103,8 @@ class Bus(Base):
     id = Column(Integer, primary_key=True)
     number = Column(String)
     company_name = Column(String)
+    route = Column(String)
+    terminal_id = Column(Integer)
 
 class Route(Base):
     __tablename__ = "routes"
@@ -111,3 +115,22 @@ class Route(Base):
     stops = Column(ARRAY(String))
     terminal_id = Column(Integer)
     bus_number = Column(String)
+
+class Discrepancy(Base):
+    __tablename__ = "discrepancies"
+
+    id = Column(Integer, primary_key=True)
+    date = Column(DateTime)
+    cashier_id = Column(Integer)
+    cashbox_number = Column(Integer)
+    discrepancy = Column(Float)
+
+class LastCashCheck(Base):
+    __tablename__ = "last_check"
+
+    id = Column(Integer, primary_key=True)
+    cashbox_number = Column(Integer)
+    fact_balance = Column(Float)
+    cashier_balance = Column(Float)
+    datetime = Column(DateTime)
+    cashier_id = Column(Integer)
