@@ -100,7 +100,7 @@ class TCOwner(Base):
     tg_id = Column(String)
 
 class Bus(Base):
-    __tablename__ = "Buses"
+    __tablename__ = "buses"
 
     id = Column(Integer, primary_key=True)
     number = Column(String)

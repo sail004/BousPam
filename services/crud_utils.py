@@ -1,4 +1,5 @@
 from datetime import datetime
+import requests
 from sqlalchemy.orm import Session
 from sqlalchemy.sql.functions import random
 from sqlalchemy.orm.attributes import flag_modified
@@ -9,6 +10,10 @@ import hashlib
 import os
 from services import schemas
 from services.luhn import set_luhn
+
+
+LAGO_URL="http://localhost:3000"
+API_KEY="d9ac4289-124c-4108-8327-13df555f96de"
 
 
 async def get_user_by_id(db: Session, user_id: int):
@@ -57,19 +62,28 @@ async def get_price_by_terminal_id(db: Session, terminal_id: int):
     return terminal.fare
 
 
+async def payment_by_billing(id_user: int, id_terminal: int, fee: float):
+    url = LAGO_URL + "/api/v1/invoices"  # /api/v1
+    headers = {"Authorization": "Bearer " + API_KEY, 'Content-Type': 'application/json'}
+    data = {"invoice": {
+      "external_customer_id": str(id_user),
+      "currency": "HTG",
+      "fees": [
+        {
+          "add_on_code": "1",
+          "units": 1,
+          "unit_amount_cents": fee * 100,
+          "description": str(id_terminal)
+        },
+        ]
+    }
+    }
+    requests.post(url=url, headers=headers, json=data)
+
+
 async def create_operation_payment(db: Session, operation: schemas.OperationPaymentCreate, op_type: str, user_id: int):
     price = await get_price_by_terminal_id(db=db, terminal_id=operation.id_terminal)
-    db_operation = models.Operation(
-        type=op_type,
-        id_terminal=operation.id_terminal,
-        id_user=user_id,
-        balance_change=-price,
-        datetime=operation.request_time,
-        terminal_hash=operation.terminal_hash
-    )
-    db.add(db_operation)
-    db.commit()
-    db.refresh(db_operation)
+    await payment_by_billing(user_id, operation.id_terminal, price)
     return await update_balance(db, user_id, -price)
 
 

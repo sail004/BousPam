@@ -27,7 +27,7 @@ app = FastAPI(title='BousPam API', docs_url=None)
 async def home():
     return RedirectResponse("/docs")
 
-favicon_path = 'static/favicon.ico'
+favicon_path = '../static/favicon.ico'
 @app.get('/favicon.ico', include_in_schema=False)
 async def favicon():
     return FileResponse(favicon_path)
