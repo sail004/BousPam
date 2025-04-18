@@ -69,4 +69,5 @@ async def delete_terminal_by_id(terminal_id: int, db: Session = Depends(get_db))
 @terminal_router.get("/get-stoplist/") #, response_model=List[schemas.Product]
 async def read_stoplist(db: Session = Depends(get_db)):
     stoplist = await crud_utils.get_stoplist(db)
-    return stoplist
+    re = [card.card_number for card in stoplist]
+    return re
