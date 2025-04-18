@@ -10,8 +10,8 @@ class UserBase(BaseModel):
     phone_number: str
     e_mail: str
     passport_number: str
-    snils: str
-    inn: str
+    niu: str
+    nif: str
 
 
 class UserCreate(UserBase):

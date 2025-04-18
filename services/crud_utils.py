@@ -8,7 +8,7 @@ import random
 from db import models
 import hashlib
 import os
-from services import schemas
+from services.schemas import schemas
 from services.luhn import set_luhn
 
 
@@ -46,8 +46,8 @@ async def create_user(db: Session, user: schemas.UserCreate):
         surname=user.surname,
         balance=0.0,
         e_mail=user.e_mail,
-        snils=user.snils,
-        inn=user.inn,
+        niu=user.niu,
+        nif=user.nif,
         passport_number=user.passport_number,
         phone_number=user.phone_number,
         )

@@ -1,6 +1,7 @@
 from fastapi import Depends, APIRouter
 from sqlalchemy.orm import Session
-from services import crud_utils, schemas
+from services import crud_utils
+from services.schemas import schemas
 from db.database import SessionLocal
 
 

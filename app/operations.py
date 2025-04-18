@@ -1,7 +1,8 @@
 from datetime import datetime, timedelta
 from fastapi import Depends, HTTPException, APIRouter
 from sqlalchemy.orm import Session
-from services import crud_utils, schemas
+from services import crud_utils, luhn
+from services.schemas import schemas
 from db.database import SessionLocal
 
 
@@ -68,7 +69,7 @@ async def payment_by_card_number(operation: schemas.OperationPaymentCreate, db: 
 @operations_router.put("/replenishment/") #, response_model=schemas.Product
 async def replenishment_by_card_number(operation: schemas.OperationReplenishmentCreate, db: Session = Depends(get_db)):
     db_card = await crud_utils.get_card_by_number(db, operation.card_number)
-    if not await BousPam.luhn.check(operation.card_number):
+    if not await luhn.check(operation.card_number):
         return "Incorrect card number"
     if db_card is None:
         return f"Card with number=\'{operation.card_number}\' not found"

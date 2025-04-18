@@ -1,6 +1,7 @@
 from fastapi import Depends, HTTPException, APIRouter
 from sqlalchemy.orm import Session
-from services import crud_utils, schemas
+from services import crud_utils
+from services.schemas import schemas
 from services.crud_utils import get_bus_by_number, get_terminal_by_id
 from db.database import SessionLocal
 
