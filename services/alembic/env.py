@@ -2,6 +2,7 @@ import asyncio
 from logging.config import fileConfig
 
 from sqlalchemy import pool
+from sqlalchemy import create_engine
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
@@ -34,6 +35,19 @@ target_metadata = Base.metadata
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
 
+# Создаём синхронное подключение
+engine = create_engine(SQLALCHEMY_DATABASE_URL)
+
+
+def run_migrations_online():
+    with engine.connect() as connection:
+        context.configure(
+            connection=connection,
+            target_metadata=target_metadata,
+            compare_type=True,
+        )
+        with context.begin_transaction():
+            context.run_migrations()
 
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode.
@@ -84,10 +98,10 @@ async def run_async_migrations() -> None:
     await connectable.dispose()
 
 
-def run_migrations_online() -> None:
-    """Run migrations in 'online' mode."""
-
-    asyncio.run(run_async_migrations())
+# def run_migrations_online() -> None:
+#     """Run migrations in 'online' mode."""
+#
+#     asyncio.run(run_async_migrations())
 
 
 if context.is_offline_mode():
