@@ -36,7 +36,7 @@ target_metadata = Base.metadata
 # ... etc.
 
 # Создаём синхронное подключение
-engine = create_engine(SQLALCHEMY_DATABASE_URL)
+engine = create_engine("postgresql://postgres:pass@localhost/postgres")
 
 
 def run_migrations_online():
