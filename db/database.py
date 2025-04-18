@@ -1,10 +1,10 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncAttrs
+#from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncAttrs
 
 
-SQLALCHEMY_DATABASE_URL = "postgresql://postgres:pass@db/postgres" #"postgresql+asyncpg://postgres:pass@localhost/postgres"
+SQLALCHEMY_DATABASE_URL = "postgresql://postgres:pass@localhost/postgres" #"postgresql+asyncpg://postgres:pass@localhost/postgres"
 
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL
