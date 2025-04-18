@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, Float, DateTime
 from sqlalchemy.dialects.postgresql import ARRAY
-from db.database import Base
+from database import Base
 
 
 class User(Base):
