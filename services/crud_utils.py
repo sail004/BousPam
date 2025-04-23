@@ -380,15 +380,17 @@ async def get_all_info_by_tg_id(db: Session, tg_id: int):
 
 
 async def add_to_stoplist(db: Session, stoplist: schemas.StopListCreate):
-    db_card = models.StopList(
-        card_number=stoplist.card_number,
-        owner_id=stoplist.owner_id,
-        owner_phone_number=stoplist.owner_phone_number
-    )
-    db.add(db_card)
-    db.commit()
-    db.refresh(db_card)
-    return db_card
+    card = get_card_from_stoplist(db, stoplist.card_number)
+    if card is None:
+        db_card = models.StopList(
+            card_number=stoplist.card_number,
+            owner_id=stoplist.owner_id,
+            owner_phone_number=stoplist.owner_phone_number
+        )
+        db.add(db_card)
+        db.commit()
+        db.refresh(db_card)
+        return db_card
 
 
 async def get_card_from_stoplist(db: Session, card_number: str):
