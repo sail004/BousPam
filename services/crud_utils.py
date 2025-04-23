@@ -90,7 +90,6 @@ async def create_operation_payment(db: Session, operation: schemas.OperationPaym
         datetime=datetime.now(),
         id_terminal=operation.id_terminal,
         terminal_hash=operation.terminal_hash,
-        cashbox_number=operation.cashbox_number,
     )
     db.add(db_operation)
     db.commit()
