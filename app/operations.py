@@ -59,7 +59,7 @@ async def payment_by_card_number(operation: schemas.OperationPaymentCreate, db: 
     new_balance = await crud_utils.create_operation_payment(db, operation, 'payment', db_card.owner_id)
     if new_balance < 0:
         await crud_utils.add_to_stoplist(db, schemas.StopListCreate(
-            card_number=db_user.card_number,
+            card_number=operation.card_number,
             owner_id=db_user.id,
             owner_phone_number=db_user.phone_number
         ))
