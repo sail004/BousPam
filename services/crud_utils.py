@@ -83,7 +83,19 @@ async def payment_by_billing(id_user: int, id_terminal: int, fee: float):
 
 async def create_operation_payment(db: Session, operation: schemas.OperationPaymentCreate, op_type: str, user_id: int):
     price = await get_price_by_terminal_id(db=db, terminal_id=operation.id_terminal)
-    await payment_by_billing(user_id, operation.id_terminal, price)
+    db_operation = models.Operation(
+        type=op_type,
+        id_user=user_id,
+        balance_change=operation.balance_change,
+        datetime=datetime.now(),
+        id_terminal=operation.id_terminal,
+        terminal_hash=operation.terminal_hash,
+        cashbox_number=operation.cashbox_number,
+    )
+    db.add(db_operation)
+    db.commit()
+    db.refresh(db_operation)
+    #await payment_by_billing(user_id, operation.id_terminal, price)
     return await update_balance(db, user_id, -price)
 
 
