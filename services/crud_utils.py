@@ -86,7 +86,7 @@ async def create_operation_payment(db: Session, operation: schemas.OperationPaym
     db_operation = models.Operation(
         type=op_type,
         id_user=user_id,
-        balance_change=operation.balance_change,
+        balance_change=-price,
         datetime=datetime.now(),
         id_terminal=operation.id_terminal,
         terminal_hash=operation.terminal_hash,
