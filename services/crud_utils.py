@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 import requests
 from sqlalchemy.orm import Session
 from sqlalchemy.sql.functions import random
@@ -9,7 +9,9 @@ from db import models
 import hashlib
 import os
 from services.schemas import schemas
+from services.settings import get_auth_data
 from services.luhn import set_luhn
+from jose import jwt
 
 
 LAGO_URL="http://localhost:3000"
@@ -192,21 +194,21 @@ async def get_terminals_by_company(db: Session, company_name: str):
     return list(db.query(models.Terminal).filter(models.Terminal.company == company_name))
 
 
-async def login_user(db: Session, phone_number: str, password: str):
-    user = db.query(models.User).filter(models.User.phone_number == phone_number).first()
-    if user is None:
-        return 'numb'
-    salt = bytes.fromhex(user.salt)
-    key = bytes.fromhex(user.key)
-    new_key = hashlib.pbkdf2_hmac(
-        'sha256',
-        password.encode('utf-8'),
-        salt,
-        100000,
-        dklen=128)
-    if new_key == key:
-        return user
-    return 'inc'
+# async def login_user(db: Session, phone_number: str, password: str):
+#     user = db.query(models.User).filter(models.User.phone_number == phone_number).first()
+#     if user is None:
+#         return 'numb'
+#     salt = bytes.fromhex(user.salt)
+#     key = bytes.fromhex(user.key)
+#     new_key = hashlib.pbkdf2_hmac(
+#         'sha256',
+#         password.encode('utf-8'),
+#         salt,
+#         100000,
+#         dklen=128)
+#     if new_key == key:
+#         return user
+#     return 'inc'
 
 
 async def create_transport_company(db: Session, company: schemas.TransportCompanyCreate):
@@ -380,7 +382,7 @@ async def get_all_info_by_tg_id(db: Session, tg_id: int):
 
 
 async def add_to_stoplist(db: Session, stoplist: schemas.StopListCreate):
-    if not is_in_stoplist(db, card_number=stoplist.card_number):
+    if not await is_in_stoplist(db, card_number=stoplist.card_number):
         db_card = models.StopList(
             card_number=stoplist.card_number,
             owner_id=stoplist.owner_id,
@@ -397,8 +399,8 @@ async def get_card_from_stoplist(db: Session, card_number: str):
 
 
 async def is_in_stoplist(db: Session, card_number: str):
-    user = await get_card_from_stoplist(db, card_number=card_number)
-    if user is None:
+    card = await get_card_from_stoplist(db, card_number=card_number)
+    if card is None:
         return False
     return True
 
@@ -726,3 +728,26 @@ async def check_operations(db: Session, cashbox_info: schemas.CheckOperations):
                                      discrepancy - last_discrepancy)
     await create_last_check(db, fact_balance, cashbox_info.cashbox_number, cashbox_info.cashbox_balance,
                             cashbox_info.cashier_id)
+
+
+async def verify_password(password: str, hashed_password: str, salt: str):
+    salt_hex = bytes.fromhex(salt)
+    key = bytes.fromhex(hashed_password)
+    new_key = hashlib.pbkdf2_hmac(
+        'sha256',
+        password.encode('utf-8'),
+        salt_hex,
+        100000,
+        dklen=128)
+    if new_key == key:
+        return True
+    return False
+
+
+async def create_access_token(data: dict):
+    to_encode = data.copy()
+    expire = datetime.now(timezone.utc) + timedelta(days=30)
+    to_encode.update({"exp": expire})
+    auth_data = get_auth_data()
+    encode_jwt = jwt.encode(to_encode, auth_data['secret_key'], algorithm=auth_data['algorithm'])
+    return encode_jwt
