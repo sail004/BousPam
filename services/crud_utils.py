@@ -5,13 +5,25 @@ from sqlalchemy.sql.functions import random
 from sqlalchemy.orm.attributes import flag_modified
 import string
 import random
+
+#from app.default import get_db
 from db import models
 import hashlib
 import os
 from services.schemas import schemas
 from services.settings import get_auth_data
 from services.luhn import set_luhn
-from jose import jwt
+from jose import jwt, JWTError
+from db.database import SessionLocal
+from fastapi import Request, HTTPException, status, Depends
+
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 
 LAGO_URL="http://localhost:3000"
@@ -744,10 +756,41 @@ async def verify_password(password: str, hashed_password: str, salt: str):
     return False
 
 
-async def create_access_token(data: dict):
+def create_access_token(data: dict):
     to_encode = data.copy()
     expire = datetime.now(timezone.utc) + timedelta(days=30)
     to_encode.update({"exp": expire})
     auth_data = get_auth_data()
     encode_jwt = jwt.encode(to_encode, auth_data['secret_key'], algorithm=auth_data['algorithm'])
     return encode_jwt
+
+
+def get_token(request: Request):
+    token = request.cookies.get('users_access_token')
+    if not token:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Token not found')
+    return token
+
+
+async def get_current_user(db: Session = Depends(get_db), token: str = Depends(get_token)):
+    try:
+        auth_data = get_auth_data()
+        payload = jwt.decode(token, auth_data['secret_key'], algorithms=[auth_data['algorithm']])
+    except JWTError:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Invalid token')
+
+    expire = payload.get('exp')
+    expire_time = datetime.fromtimestamp(int(expire), tz=timezone.utc)
+    if (not expire) or (expire_time < datetime.now(timezone.utc)):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Token expired')
+
+    user_id = payload.get('sub')
+    if not user_id:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='User with this id not found')
+
+    employee = await get_employee_by_id(db, user_id)
+    db_tc_owner = await get_transport_company_owner_by_id(db, user_id)
+    if db_tc_owner is None and employee is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='User not found')
+
+    return employee if employee else db_tc_owner
