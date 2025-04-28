@@ -73,56 +73,10 @@ class TerminalUpdate(TerminalBase):
     pass
 
 
-class TransportCompanyBase(BaseModel):
-    name: str
-    owner_id: int
 
 
-class TransportCompany(TransportCompanyBase):
-    id: int
-    owner_name: int
-    owner_surname: int
-    owner_number: str
 
 
-class TransportCompanyCreate(TransportCompanyBase):
-    pass
-
-
-class TransportCompanyUpdate(TransportCompanyBase):
-    pass
-
-
-class EmployeeBase(BaseModel):
-    name: str
-    surname: str
-    password: str
-    role: str = Field(default=..., description='One of 3 roles: Admin, Cashier, Owner')
-    login: str
-    gender: str
-    date_of_birth: str
-    phone_number: str
-
-    @field_validator('role')
-    @classmethod
-    def validate_role(cls, values):
-        if values not in ['Admin', 'Cashier', 'Owner']:
-            raise ValueError("Role should be one of 'Admin', 'Cashier', 'Owner'")
-        return values
-
-
-class EmployeeCreate(EmployeeBase):
-    pass
-
-
-class EmployeeUpdate(EmployeeBase):
-    pass
-
-
-class Employee(EmployeeBase):
-    id: int
-    salt: str
-    key: str
 
 
 

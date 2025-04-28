@@ -5,14 +5,15 @@ from sqlalchemy.sql.functions import random
 from sqlalchemy.orm.attributes import flag_modified
 import string
 import random
-
-#from app.default import get_db
 from db import models
 import hashlib
 import os
 from services.schemas import schemas
-from services.schemas.bus import bus_request, bus_response
-from services.schemas.card import card_request, card_response
+from services.schemas.bus import bus_request
+from services.schemas.card import card_request
+from services.schemas.company import company_request
+from services.schemas.login import login_request
+from services.schemas.employee import employee_request
 from services.settings import get_auth_data
 from services.luhn import set_luhn
 from jose import jwt, JWTError
@@ -225,7 +226,7 @@ async def get_terminals_by_company(db: Session, company_name: str):
 #     return 'inc'
 
 
-async def create_transport_company(db: Session, company: schemas.TransportCompanyCreate):
+async def create_transport_company(db: Session, company: company_request.TransportCompanyCreate):
     db_owner = await get_transport_company_owner_by_id(db, owner_id=company.owner_id)
     if not db_owner:
         return f'Owner with id=\'{company.owner_id}\' does not exist'
@@ -253,7 +254,7 @@ async def get_transport_company_by_name(db: Session, tc_name: str) -> object:
     return db.query(models.TransportCompany).filter(models.TransportCompany.name == tc_name).first()
 
 
-async def update_transport_company(db: Session, company: schemas.TransportCompanyUpdate, tc_id: int):
+async def update_transport_company(db: Session, company: company_request.TransportCompanyUpdate, tc_id: int):
     db_company = await get_transport_company_by_id(db, tc_id=tc_id)
     company_data = company.dict()
 
@@ -279,7 +280,7 @@ async def get_terminals(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.Terminal).offset(skip).limit(limit).all()
 
 
-async def create_employee(db: Session, employee: schemas.EmployeeCreate):
+async def create_employee(db: Session, employee: employee_request.EmployeeCreate):
     salt = os.urandom(32)
     key = hashlib.pbkdf2_hmac('sha256', employee.password.encode('utf-8'), salt, 100000, dklen=128)
     db_employee = models.Employee(
@@ -332,7 +333,7 @@ async def get_employee_by_id(db: Session, employee_id: int):
     return db.query(models.Employee).filter(models.Employee.id == employee_id).first()
 
 
-async def update_employee(db: Session, employee: schemas.EmployeeUpdate, employee_id: int):
+async def update_employee(db: Session, employee: employee_request.EmployeeUpdate, employee_id: int):
     db_employee = await get_employee_by_id(db, employee_id=employee_id)
     employee_data = employee.dict()
 
@@ -344,7 +345,7 @@ async def update_employee(db: Session, employee: schemas.EmployeeUpdate, employe
 
 
 async def delete_employee(db: Session, employee_id: int):
-    db_employee = get_employee_by_id(db, employee_id=employee_id)
+    db_employee = await get_employee_by_id(db, employee_id=employee_id)
 
     db.delete(db_employee)
     db.commit()
