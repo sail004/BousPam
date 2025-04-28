@@ -11,6 +11,8 @@ from db import models
 import hashlib
 import os
 from services.schemas import schemas
+from services.schemas.bus import bus_request, bus_response
+from services.schemas.card import card_request, card_response
 from services.settings import get_auth_data
 from services.luhn import set_luhn
 from jose import jwt, JWTError
@@ -444,7 +446,7 @@ async def get_next_card_number(db: Session):
     return await set_luhn(new_card_number)
 
 
-async def create_card(db: Session, card: schemas.CardCreate):
+async def create_card(db: Session, card: card_request.CardCreate):
     db_card = models.Card(
         card_number= await get_next_card_number(db),
         owner_id=card.owner_id,
@@ -473,7 +475,7 @@ async def get_card_by_id(db: Session, card_id: int):
     return db.query(models.Card).filter(models.Card.id == card_id).first()
 
 
-async def update_card(db: Session, card: schemas.CardUpdate, card_id: int):
+async def update_card(db: Session, card: card_request.CardUpdate, card_id: int):
     db_card = await get_card_by_id(db, card_id=card_id)
     card_data = card.dict()
 
@@ -485,7 +487,7 @@ async def update_card(db: Session, card: schemas.CardUpdate, card_id: int):
 
 
 async def delete_card(db: Session, card_id: int):
-    db_card = get_card_by_id(db, card_id=card_id)
+    db_card = await get_card_by_id(db, card_id=card_id)
 
     db.delete(db_card)
     db.commit()
@@ -573,7 +575,7 @@ async def get_transport_company_income_by_id(db: Session, tc_id: int):
     return income
 
 
-async def create_bus(db: Session, bus: schemas.BusCreate):
+async def create_bus(db: Session, bus: bus_request.BusCreate):
     db_bus = models.Bus(
         number=bus.number,
         company_name=bus.company_name,
@@ -583,6 +585,7 @@ async def create_bus(db: Session, bus: schemas.BusCreate):
     db.add(db_bus)
     db.commit()
     db.refresh(db_bus)
+    #return bus_response.ReturnId(id=db_bus.id)
     return db_bus.id
 
 
@@ -590,7 +593,7 @@ async def get_bus_by_id(db: Session, bus_id: int) -> object:
     return db.query(models.Bus).filter(models.Bus.id == bus_id).first()
 
 
-async def update_bus(db: Session, bus: schemas.BusUpdate, bus_id: int):
+async def update_bus(db: Session, bus: bus_request.BusUpdate, bus_id: int):
     db_bus = await get_bus_by_id(db, bus_id=bus_id)
     bus_data = bus.dict()
 

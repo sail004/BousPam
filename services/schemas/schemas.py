@@ -147,23 +147,6 @@ class StopList(StopListBase):
     id: int
 
 
-class CardBase(BaseModel):
-    owner_id: int
-
-
-class CardCreate(CardBase):
-    pass
-
-
-class CardUpdate(CardBase):
-    pass
-
-
-class Card(CardBase):
-    id: int
-    card_number: str
-
-
 class TCOwnerBase(BaseModel):
     name: str
     surname: str
@@ -186,23 +169,7 @@ class TCOwner(TCOwnerBase):
     key: str
 
 
-class BusBase(BaseModel):
-    number: str
-    company_name: str
-    terminal_id: int
-    route: str
 
-
-class BusCreate(BusBase):
-    pass
-
-
-class BusUpdate(BusBase):
-    pass
-
-
-class Bus(BusBase):
-    id: int
 
 
 class RouteBase(BaseModel):
@@ -245,3 +212,12 @@ class CheckOperations(BaseModel):
     cashier_id: int
     cashbox_number: int
     cashbox_balance: float
+
+
+class ReturnId(BaseModel):
+    id: int
+
+
+class SuccesfulDeletion:
+    status = "ok"
+    message = "Deletion was successful"
