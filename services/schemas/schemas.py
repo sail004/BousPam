@@ -125,9 +125,7 @@ class Employee(EmployeeBase):
     key: str
 
 
-class Login(BaseModel):
-    login: str
-    password: str
+
 
 
 class StopListBase(BaseModel):

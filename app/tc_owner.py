@@ -66,14 +66,14 @@ async def read_transport_company_owner_by_id(owner_name: str, db: Session = Depe
     return db_tc_owner
 
 
-@owner_router.put("/login/") #, response_model=List[schemas.Product]
-async def login_transport_company_owner(auth_data: schemas.Login, db: Session = Depends(get_db)):
-    db_tc_owner = await crud_utils.login_transport_company_owner(db, login=auth_data.login, password=auth_data.password)
-    if db_tc_owner == 'numb':
-        return 'Incorrect login'
-    if db_tc_owner == 'inc':
-        return 'Incorrect password'
-    return db_tc_owner
+# @owner_router.put("/login/") #, response_model=List[schemas.Product]
+# async def login_transport_company_owner(auth_data: schemas.Login, db: Session = Depends(get_db)):
+#     db_tc_owner = await crud_utils.login_transport_company_owner(db, login=auth_data.login, password=auth_data.password)
+#     if db_tc_owner == 'numb':
+#         return 'Incorrect login'
+#     if db_tc_owner == 'inc':
+#         return 'Incorrect password'
+#     return db_tc_owner
 
 
 @owner_router.get("/get-company/") #, response_model=schemas.Product

@@ -33,14 +33,14 @@ async def read_employees(skip: int = 0, limit: int = 100, db: Session = Depends(
     return employees
 
 
-@employee_router.put("/login/") #, response_model=List[schemas.Product]
-async def login_employee(auth_data: schemas.Login, db: Session = Depends(get_db)):
-    db_employee = await crud_utils.login_employee(db, login=auth_data.login, password=auth_data.password)
-    if db_employee == 'numb':
-        return 'Incorrect login'
-    if db_employee == 'inc':
-        return 'Incorrect password'
-    return db_employee
+# @employee_router.put("/login/") #, response_model=List[schemas.Product]
+# async def login_employee(auth_data: schemas.Login, db: Session = Depends(get_db)):
+#     db_employee = await crud_utils.login_employee(db, login=auth_data.login, password=auth_data.password)
+#     if db_employee == 'numb':
+#         return 'Incorrect login'
+#     if db_employee == 'inc':
+#         return 'Incorrect password'
+#     return db_employee
 
 
 @employee_router.get("/get/") #, response_model=schemas.Product
