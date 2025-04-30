@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from fastapi import Depends, HTTPException, APIRouter
 from sqlalchemy.orm import Session
 from services import crud_utils, luhn
-from services.schemas import schemas
+from services.schemas.operations import operations_request, operations_response
 from db.database import SessionLocal
 
 
@@ -17,13 +17,21 @@ def get_db():
 operations_router = APIRouter(prefix='/operations', tags=['Interaction with transactions'])
 
 
-@operations_router.get("/getlist/") #, response_model=List[schemas.Product]
+@operations_router.get(
+    "/getlist/",
+    response_model=list[operations_response.ReturnOperation],
+    description="Operation for getting list of all operations"
+)
 async def read_operations(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     operations = await crud_utils.get_operations(db, skip=skip, limit=limit)
     return operations
 
 
-@operations_router.get("/get/by-terminal-id/") #, response_model=schemas.Product
+@operations_router.get(
+    "/get/by-terminal-id/",
+    response_model=list[operations_response.ReturnOperation],
+    description="Operation for getting list of operations by id of terminal that provided these operations"
+)
 async def read_operations_by_terminal_id(terminal_id: int, db: Session = Depends(get_db)):
     db_ops = await crud_utils.get_operations_by_terminal_id(db, term_id=terminal_id)
     if db_ops is None:
@@ -31,7 +39,11 @@ async def read_operations_by_terminal_id(terminal_id: int, db: Session = Depends
     return db_ops
 
 
-@operations_router.get("/get/by-user-id/") #, response_model=schemas.Product
+@operations_router.get(
+    "/get/by-user-id/",
+    response_model=list[operations_response.ReturnOperation],
+    description="Operation for getting list of operations by id of user with whose account these operations were performed"
+)
 async def read_operations_by_user_id(user_id: int, db: Session = Depends(get_db)):
     db_ops = await crud_utils.get_operations_by_user_id(db, user_id=user_id)
     if db_ops is None:
@@ -39,8 +51,12 @@ async def read_operations_by_user_id(user_id: int, db: Session = Depends(get_db)
     return db_ops
 
 
-@operations_router.put("/payment/") #, response_model=schemas.Product
-async def payment_by_card_number(operation: schemas.OperationPaymentCreate, db: Session = Depends(get_db)):
+@operations_router.put(
+    "/payment/",
+    response_model=operations_response.ReturnBalance,
+    description="Operation for payment by user's card number, providing by terminal"
+)
+async def payment_by_card_number(operation: operations_request.OperationPaymentCreate, db: Session = Depends(get_db)):
     db_card = await crud_utils.get_card_by_number(db, card_number=operation.card_number)
     db_terminal = await crud_utils.get_terminal_by_id(db, terminal_id=operation.id_terminal)
     if db_terminal is None:
@@ -58,7 +74,7 @@ async def payment_by_card_number(operation: schemas.OperationPaymentCreate, db: 
             raise HTTPException(status_code=400, detail=f"Insufficient funds to make the payment")
     new_balance = await crud_utils.create_operation_payment(db, operation, 'payment', db_card.owner_id)
     if new_balance < 0:
-        await crud_utils.add_to_stoplist(db, schemas.StopListCreate(
+        await crud_utils.add_to_stoplist(db, operations_request.StopListCreate(
             card_number=operation.card_number,
             owner_id=db_user.id,
             owner_phone_number=db_user.phone_number
@@ -66,8 +82,12 @@ async def payment_by_card_number(operation: schemas.OperationPaymentCreate, db: 
     return new_balance
 
 
-@operations_router.put("/replenishment/") #, response_model=schemas.Product
-async def replenishment_by_card_number(operation: schemas.OperationReplenishmentCreate, db: Session = Depends(get_db)):
+@operations_router.put(
+    "/replenishment/",
+    response_model=operations_response.ReturnBalance,
+    description="Operation for replenishment by user's card number, providing by cashier(B2C-manager)"
+)
+async def replenishment_by_card_number(operation: operations_request.OperationReplenishmentCreate, db: Session = Depends(get_db)):
     db_card = await crud_utils.get_card_by_number(db, operation.card_number)
     if not await luhn.check(operation.card_number):
         return "Incorrect card number"
@@ -82,8 +102,11 @@ async def replenishment_by_card_number(operation: schemas.OperationReplenishment
     return new_balance
 
 
-@operations_router.put("/check-operations/") #, response_model=schemas.Product
-async def check_operations(cashbox: schemas.CheckOperations, db: Session = Depends(get_db)):
+@operations_router.put(
+    "/check-operations/",
+    description="Operation for checking operations and record the discrepancy, if any. It is performed when the cashier logs in and out of the account"
+)
+async def check_operations(cashbox: operations_request.CheckOperations, db: Session = Depends(get_db)):
     db_cashier = await crud_utils.get_employee_by_id(db, cashbox.cashier_id)
     if db_cashier is None:
         raise HTTPException(status_code=404, detail=f"Employee with id=\'{cashbox.cashier_id}\' not found")

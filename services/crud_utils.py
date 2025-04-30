@@ -8,12 +8,17 @@ import random
 from db import models
 import hashlib
 import os
-from services.schemas import schemas
 from services.schemas.bus import bus_request
 from services.schemas.card import card_request
 from services.schemas.company import company_request
 from services.schemas.login import login_request
 from services.schemas.employee import employee_request
+from services.schemas.operations import operations_request
+from services.schemas.route import route_request
+from services.schemas.tc_owners import tc_owners_request
+from services.schemas.terminal import terminal_request
+from services.schemas.tg import tg_request
+from services.schemas.user import user_request
 from services.settings import get_auth_data
 from services.luhn import set_luhn
 from jose import jwt, JWTError
@@ -57,7 +62,7 @@ async def get_users(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.User).offset(skip).limit(limit).all()
 
 
-async def create_user(db: Session, user: schemas.UserCreate):
+async def create_user(db: Session, user: user_request.UserCreate):
     db_user = models.User(
         name=user.name,
         surname=user.surname,
@@ -98,7 +103,7 @@ async def payment_by_billing(id_user: int, id_terminal: int, fee: float):
     requests.post(url=url, headers=headers, json=data)
 
 
-async def create_operation_payment(db: Session, operation: schemas.OperationPaymentCreate, op_type: str, user_id: int):
+async def create_operation_payment(db: Session, operation: operations_request.OperationPaymentCreate, op_type: str, user_id: int):
     price = await get_price_by_terminal_id(db=db, terminal_id=operation.id_terminal)
     db_operation = models.Operation(
         type=op_type,
@@ -115,7 +120,7 @@ async def create_operation_payment(db: Session, operation: schemas.OperationPaym
     return await update_balance(db, user_id, -price)
 
 
-async def create_operation_replenishment(db: Session, operation: schemas.OperationReplenishmentCreate, op_type: str, user_id: int):
+async def create_operation_replenishment(db: Session, operation: operations_request.OperationReplenishmentCreate, op_type: str, user_id: int):
     db_operation = models.Operation(
         type=op_type,
         id_user=user_id,
@@ -130,7 +135,7 @@ async def create_operation_replenishment(db: Session, operation: schemas.Operati
     return await update_balance(db, user_id, operation.balance_change)
 
 
-async def update_user(db: Session, user: schemas.UserUpdate, user_id: int):
+async def update_user(db: Session, user: user_request.UserUpdate, user_id: int):
     db_user = await get_user_by_id(db, user_id=user_id)
     user_data = user.dict()
 
@@ -169,7 +174,7 @@ async def get_operations_by_user_id(db: Session, user_id: int):
     return list(db.query(models.Operation).filter(models.Operation.id_user == user_id))
 
 
-async def create_terminal(db: Session, terminal: schemas.TerminalCreate):
+async def create_terminal(db: Session, terminal: terminal_request.TerminalCreate):
     random_string = ''.join(random.choices(string.ascii_letters + string.digits, k=8))
     hash = hashlib.pbkdf2_hmac('sha256', random_string.encode('utf-8'), os.urandom(32), 100000, dklen=128)
     db_term = models.Terminal(
@@ -187,7 +192,7 @@ async def get_terminal_by_id(db: Session, terminal_id: int):
     return db.query(models.Terminal).filter(models.Terminal.terminal_id == terminal_id).first()
 
 
-async def update_terminal(db: Session, term: schemas.TerminalUpdate, term_id: int):
+async def update_terminal(db: Session, term: terminal_request.TerminalUpdate, term_id: int):
     db_term = await get_terminal_by_id(db, terminal_id=term_id)
     term_data = term.dict()
 
@@ -248,6 +253,7 @@ async def create_transport_company(db: Session, company: company_request.Transpo
 
 async def get_transport_company_by_id(db: Session, tc_id: int) -> object:
     return db.query(models.TransportCompany).filter(models.TransportCompany.id == tc_id).first()
+
 
 
 async def get_transport_company_by_name(db: Session, tc_name: str) -> object:
@@ -367,7 +373,7 @@ async def set_user_tg_id(db: Session, tg_id: int, card_number: str):
     return 'success'
 
 
-async def set_employee_tg_id(db: Session, info: schemas.SetTgId):
+async def set_employee_tg_id(db: Session, info: tg_request.SetTgId):
     db_employee = await get_employee_by_id(db, employee_id=info.entity_id)
     setattr(db_employee, 'tg_id', info.tg_id)
     db.add(db_employee)
@@ -375,7 +381,7 @@ async def set_employee_tg_id(db: Session, info: schemas.SetTgId):
     return 'success'
 
 
-async def set_transport_company_owner_tg_id(db: Session, info: schemas.SetTgId):
+async def set_transport_company_owner_tg_id(db: Session, info: tg_request.SetTgId):
     db_tc_owner = await get_employee_by_id(db, employee_id=info.entity_id)
     setattr(db_tc_owner, 'tg_id', info.tg_id)
     db.add(db_tc_owner)
@@ -396,7 +402,7 @@ async def get_all_info_by_tg_id(db: Session, tg_id: int):
     return re_object
 
 
-async def add_to_stoplist(db: Session, stoplist: schemas.StopListCreate):
+async def add_to_stoplist(db: Session, stoplist: operations_request.StopListCreate):
     if not await is_in_stoplist(db, card_number=stoplist.card_number):
         db_card = models.StopList(
             card_number=stoplist.card_number,
@@ -494,7 +500,7 @@ async def delete_card(db: Session, card_id: int):
     db.commit()
 
 
-async def create_transport_company_owner(db: Session, owner: schemas.TCOwnerCreate):
+async def create_transport_company_owner(db: Session, owner: tc_owners_request.TCOwnerCreate):
     salt = os.urandom(32)
     key = hashlib.pbkdf2_hmac('sha256', owner.password.encode('utf-8'), salt, 100000, dklen=128)
     db_tc_owner = models.TCOwner(
@@ -516,7 +522,15 @@ async def get_transport_company_owner_by_id(db: Session, owner_id: int):
     return db.query(models.TCOwner).filter(models.TCOwner.id == owner_id).first()
 
 
-async def update_transport_company_owner(db: Session, owner: schemas.TCOwnerUpdate, owner_id: int):
+async def get_transport_company_owner_by_phone_number(db: Session, phone_number: str):
+    return db.query(models.TCOwner).filter(models.TCOwner.phone_number == phone_number).first()
+
+
+async def get_transport_company_owner_by_login(db: Session, login: str):
+    return db.query(models.Employee).filter(models.Employee.login == login).first()
+
+
+async def update_transport_company_owner(db: Session, owner: tc_owners_request.TCOwnerUpdate, owner_id: int):
     db_owner = await get_transport_company_owner_by_id(db, owner_id=owner_id)
     owner_data = owner.dict()
 
@@ -624,7 +638,7 @@ async def get_bus_by_number(db: Session, bus_number: str) -> object:
     return db.query(models.Bus).filter(models.Bus.number == bus_number).first()
 
 
-async def create_route(db: Session, route: schemas.RouteCreate):
+async def create_route(db: Session, route: route_request.RouteCreate):
     db_route = models.Route(
         transport_company=route.transport_company,
         name = route.name,
@@ -642,7 +656,7 @@ async def get_route_by_id(db: Session, route_id: int):
     return db.query(models.Route).filter(models.Route.id == route_id).first()
 
 
-async def update_route(db: Session, route: schemas.RouteUpdate, route_id: int):
+async def update_route(db: Session, route: route_request.RouteUpdate, route_id: int):
     db_route = await get_route_by_id(db, route_id=route_id)
     route_data = route.dict()
 
@@ -706,7 +720,7 @@ async def get_last_discrepancy(db: Session, cashbox_number: int):
     return None
 
 
-async def check_operations(db: Session, cashbox_info: schemas.CheckOperations):
+async def check_operations(db: Session, cashbox_info: operations_request.CheckOperations):
     start_fact = 0
     start_cashier = 0
     now = datetime.now()
