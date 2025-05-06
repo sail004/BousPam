@@ -429,9 +429,12 @@ async def is_in_stoplist(db: Session, card_number: str):
 
 
 async def delete_from_stoplist(db: Session, card_number: str):
-    db_card = await get_card_from_stoplist(db, card_number=card_number)
-    db.delete(db_card)
-    db.commit()
+    db_user = await get_user_by_card_number(db=db, card_number=card_number)
+    for card in db_user.cards:
+        if await is_in_stoplist(db, card):
+            db_card = await get_card_from_stoplist(db, card_number=card_number)
+            db.delete(db_card)
+            db.commit()
 
 
 async def get_stoplist(db: Session):

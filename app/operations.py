@@ -97,7 +97,7 @@ async def replenishment_by_card_number(operation: operations_request.OperationRe
     if db_user is None:
         raise HTTPException(status_code=404, detail=f"User with id=\'{db_card.owner_id}\' not found")
     new_balance = await crud_utils.create_operation_replenishment(db, operation, 'replenishment', db_card.owner_id)
-    if new_balance > 0 and await crud_utils.is_in_stoplist(db, operation.card_number):
+    if new_balance > 0:
         await crud_utils.delete_from_stoplist(db, operation.card_number)
     return new_balance
 
