@@ -342,7 +342,8 @@ async def get_employee_by_id(db: Session, employee_id: int):
 async def update_employee(db: Session, employee: employee_request.EmployeeUpdate, employee_id: int):
     db_employee = await get_employee_by_id(db, employee_id=employee_id)
     employee_data = employee.dict()
-
+    new_key = hashlib.pbkdf2_hmac('sha256', employee.password.encode('utf-8'), bytes.fromhex(db_employee.salt), 100000, dklen=128)
+    employee_data['key'] = new_key
     for key, value in employee_data.items():
         setattr(db_employee, key, value)
     db.add(db_employee)
@@ -403,16 +404,17 @@ async def get_all_info_by_tg_id(db: Session, tg_id: int):
 
 
 async def add_to_stoplist(db: Session, stoplist: operations_request.StopListCreate):
-    if not await is_in_stoplist(db, card_number=stoplist.card_number):
-        db_card = models.StopList(
-            card_number=stoplist.card_number,
-            owner_id=stoplist.owner_id,
-            owner_phone_number=stoplist.owner_phone_number
-        )
-        db.add(db_card)
-        db.commit()
-        db.refresh(db_card)
-        return db_card
+    db_user = await get_user_by_id(db=db, user_id=stoplist.owner_id)
+    for card in db_user.cards:
+        if not await is_in_stoplist(db, card_number=card):
+            db_card = models.StopList(
+                card_number=card,
+                owner_id=stoplist.owner_id,
+                owner_phone_number=stoplist.owner_phone_number
+            )
+            db.add(db_card)
+            db.commit()
+            db.refresh(db_card)
 
 
 async def get_card_from_stoplist(db: Session, card_number: str):
@@ -533,7 +535,9 @@ async def get_transport_company_owner_by_login(db: Session, login: str):
 async def update_transport_company_owner(db: Session, owner: tc_owners_request.TCOwnerUpdate, owner_id: int):
     db_owner = await get_transport_company_owner_by_id(db, owner_id=owner_id)
     owner_data = owner.dict()
-
+    new_key = hashlib.pbkdf2_hmac('sha256', db_owner.password.encode('utf-8'), bytes.fromhex(db_owner.salt), 100000,
+                                  dklen=128)
+    owner_data['key'] = new_key
     for key, value in owner_data.items():
         setattr(db_owner, key, value)
     db.add(db_owner)
