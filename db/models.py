@@ -136,3 +136,19 @@ class LastCashCheck(Base):
     cashier_balance = Column(Float)
     datetime = Column(DateTime)
     cashier_id = Column(Integer)
+
+class Queue(Base):
+    __tablename__ = "queue"
+
+    id = Column(Integer, primary_key=True)
+    datetime = Column(DateTime)
+    type = Column(String)
+    place = Column(String)
+
+class Place(Base):
+    __tablename__ = "places"
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String)
+    address = Column(String)
+    status = Column(String)

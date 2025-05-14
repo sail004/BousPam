@@ -19,6 +19,7 @@ from services.schemas.tc_owners import tc_owners_request
 from services.schemas.terminal import terminal_request
 from services.schemas.tg import tg_request
 from services.schemas.user import user_request
+from services.schemas.place import place_request
 from services.settings import get_auth_data
 from services.luhn import set_luhn
 from jose import jwt, JWTError
@@ -819,3 +820,46 @@ async def get_current_user(db: Session = Depends(get_db), token: str = Depends(g
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='User not found')
 
     return employee if employee else db_tc_owner
+
+
+async def get_places(db: Session, skip: int = 0, limit: int = 100):
+    return db.query(models.Place).offset(skip).limit(limit).all()
+
+
+async def get_place_by_name(db: Session, name: str):
+    return db.query(models.Place).filter(models.Place.name == name).first()
+
+
+async def create_place(db: Session, place: place_request.PlaceCreate):
+    db_place = models.Place(
+        name=place.name,
+        address=place.address,
+        status=place.status,
+    )
+    db.add(db_place)
+    db.commit()
+    db.refresh(db_place)
+    return db_place
+
+
+async def get_place_by_id(db: Session, place_id: int):
+    return db.query(models.Place).filter(models.Place.id == place_id).first()
+
+
+async def update_place(db: Session, place: place_request.PlaceUpdate, place_id: int):
+    db_place = await get_place_by_id(db=db, place_id=place_id)
+    place_data = place.dict()
+
+    for key, value in place_data.items():
+        setattr(db_place, key, value)
+    db.add(db_place)
+    db.commit()
+    return db_place
+
+
+async def update_place_status(db: Session, status: str, name: str):
+    db_place = await get_place_by_name(db=db, name=name)
+    setattr(db_place, 'status', status)
+    db.add(db_place)
+    db.commit()
+    return db_place

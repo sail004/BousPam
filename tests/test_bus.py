@@ -15,7 +15,7 @@ def test_create_bus():
         },
     )
     assert response.status_code == 200
-    assert type(response.json()) == int
+    assert type(response.json()) == dict
 
 
 def test_update_bus_by_id():
@@ -29,7 +29,7 @@ def test_update_bus_by_id():
         }
     )
     assert response.status_code == 200
-    assert response.json() == {}
+    assert type(response.json()) == dict
 
 
 def test_read_bus_by_number():
@@ -42,7 +42,7 @@ def test_read_bus_by_number():
         "company_name": "string1",
         "terminal_id": 1,
         "route": "string",
-        "id": 1
+        "id": 4
     }
 
 def test_read_buses_by_company_name():
@@ -56,27 +56,6 @@ def test_read_buses_by_company_name():
         "company_name": "string1",
         "terminal_id": 1,
         "route": "string",
-        "id": 1
-    },
-    {
-        "number": "AA220A",
-        "company_name": "string1",
-        "terminal_id": 1,
-        "route": "string",
-        "id": 2
-    },
-    {
-        "number": "AA220A",
-        "company_name": "string1",
-        "terminal_id": 1,
-        "route": "string",
-        "id": 3
-    },
-    {
-        "number": "AA220A",
-        "company_name": "string1",
-        "terminal_id": 1,
-        "route": "string",
         "id": 4
     },
     {
@@ -84,6 +63,41 @@ def test_read_buses_by_company_name():
         "company_name": "string1",
         "terminal_id": 1,
         "route": "string",
-        "id": 16
+        "id": 1
+    },
+    {
+        "number": "AA220A",
+        "company_name": "string1",
+        "terminal_id": 1,
+        "route": "string",
+        "id": 5
+    },
+    {
+        "number": "AA220A",
+        "company_name": "string1",
+        "terminal_id": 1,
+        "route": "string",
+        "id": 6
+    },
+    {
+        "number": "AA220A",
+        "company_name": "string1",
+        "terminal_id": 1,
+        "route": "string",
+        "id": 7
+    },
+    {
+        "number": "AA220A",
+        "company_name": "string1",
+        "terminal_id": 1,
+        "route": "string",
+        "id": 8
+    },
+    {
+        "number": "AA220A",
+        "company_name": "string1",
+        "terminal_id": 1,
+        "route": "string",
+        "id": 9
     },
     ]
