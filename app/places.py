@@ -87,3 +87,20 @@ async def update_place_by_name(name: str, status: str, db: Session = Depends(get
     if db_place is None:
         raise HTTPException(status_code=404, detail=f"Place with name=\'{name}\' not found")
     return await crud_utils.update_place_status(db, status=status, name=name)
+
+
+@place_router.delete(
+    "/delete/",
+    response_model=place_response.SuccessfulDeletion,
+    description="Operation for deleting place by its id"
+)
+async def delete_employee_by_id(place_id: int, db: Session = Depends(get_db)):
+    db_place = await crud_utils.get_place_by_id(db, place_id=place_id)
+    if db_place is None:
+        raise HTTPException(status_code=404, detail=f"Place with id=\'{place_id}\' not found")
+    await crud_utils.delete_place(db, place_id=place_id)
+
+    return {
+        "status": "ok",
+        "message": "Deletion was successful"
+    }

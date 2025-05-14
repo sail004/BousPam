@@ -863,3 +863,10 @@ async def update_place_status(db: Session, status: str, name: str):
     db.add(db_place)
     db.commit()
     return db_place
+
+
+async def delete_place(db: Session, place_id: int):
+    db_place = await get_place_by_id(db, place_id=place_id)
+
+    db.delete(db_place)
+    db.commit()
