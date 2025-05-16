@@ -39,9 +39,22 @@ async def read_occupied_queues(place_name: str, date: datetime, db: Session = De
 
 @queue_router.put(
     "/occupy-place/",
-    response_model=list[queue_response.ReturnQueue],
+    response_model=queue_response.Message,
     description="Operation for occupy place in queue"
 )
 async def occupy_place_in_queue(place: queue_request.OccupyPlaceInQueue, db: Session = Depends(get_db)):
     status = await crud_utils.occupy_place_in_queue(db=db, place_info=place)
+    return queue_response.Message(msg=status)
+
+
+@queue_router.put(
+    "/de-occupy-place/",
+    response_model=queue_response.Message,
+    description="Operation for de-occupy place in queue"
+)
+async def de_occupy_place_in_queue(place_info: queue_request.DeOccupyPlaceInQueue, db: Session = Depends(get_db)):
+    place = await crud_utils.get_place_in_queue(db=db, place_info=place_info, status='occupied')
+    if place is None:
+        raise HTTPException(status_code=404, detail="Place not found")
+    status = await crud_utils.de_occupy_place_in_queue(db=db, place=place)
     return queue_response.Message(msg=status)

@@ -17,3 +17,10 @@ class OccupyPlaceInQueue(BaseModel):
         if values not in ['getting card', 'replenishment']:
             raise ValueError("Type should be one of 'getting card', 'replenishment'")
         return values
+
+
+class DeOccupyPlaceInQueue(BaseModel):
+    passenger_id: int
+    date: datetime
+    time: datetime
+    place: str
