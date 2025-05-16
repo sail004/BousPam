@@ -11,7 +11,7 @@ class PlaceBase(BaseModel):
 
     @field_validator('status')
     @classmethod
-    def validate_role(cls, values):
+    def validate_status(cls, values):
         if values not in ['active', 'inactive']:
             raise ValueError("Status should be one of 'active', 'inactive'")
         return values

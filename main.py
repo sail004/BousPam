@@ -12,6 +12,7 @@ from app.tc_owner import owner_router
 from app.login import login_router
 from app.buses import bus_router
 from app.routes import route_router
+from app.places import place_router
 from db.database import engine
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
@@ -60,3 +61,4 @@ app.include_router(card_router)
 app.include_router(owner_router)
 app.include_router(bus_router)
 app.include_router(route_router)
+app.include_router(place_router)

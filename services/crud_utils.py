@@ -20,6 +20,7 @@ from services.schemas.terminal import terminal_request
 from services.schemas.tg import tg_request
 from services.schemas.user import user_request
 from services.schemas.place import place_request
+from services.schemas.queue import queue_request
 from services.settings import get_auth_data
 from services.luhn import set_luhn
 from jose import jwt, JWTError
@@ -870,3 +871,32 @@ async def delete_place(db: Session, place_id: int):
 
     db.delete(db_place)
     db.commit()
+
+
+async def get_free_queues(db: Session, place_name: str, date: datetime):
+    return (db.query(models.Queue)
+            .filter(
+        models.Queue.status == 'free', models.Queue.place == place_name, models.Queue.date == date)
+            .all())
+
+
+async def get_occupied_queues(db: Session, place_name: str, date: datetime):
+    return (db.query(models.Queue)
+            .filter(
+        models.Queue.status == 'occupied', models.Queue.place == place_name, models.Queue.date == date)
+            .all())
+
+
+async def occupy_place_in_queue(db: Session, place_info: queue_request.OccupyPlaceInQueue):
+    place = (db.query(models.Queue)
+                .filter(models.Queue.status == 'free',
+                        models.Queue.place == place_info.place,
+                        models.Queue.date == place_info.date,
+                        models.Queue.time == place_info.time)
+             .first())
+    setattr(place, 'status', 'occupied')
+    setattr(place, 'passenger_id', place_info.passenger_id)
+    setattr(place, 'type', place_info.type)
+    db.add(place)
+    db.commit()
+    return 'successfully occupied place in queue'
