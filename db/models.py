@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Float, DateTime, Boolean
+from sqlalchemy import Column, Integer, String, Float, DateTime, Boolean, Date, Time
 from sqlalchemy.dialects.postgresql import ARRAY
 from db.database import Base
 
@@ -142,8 +142,8 @@ class Queue(Base):
 
     id = Column(Integer, primary_key=True)
     status = Column(String)
-    date = Column(DateTime)
-    time = Column(DateTime)
+    date = Column(Date)
+    time = Column(Time)
     passenger_id = Column(Integer)
     type = Column(String)
     place = Column(String)

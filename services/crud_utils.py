@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta, timezone, date, time
 import requests
 from sqlalchemy.orm import Session
 from sqlalchemy.sql.functions import random
@@ -8,6 +8,7 @@ import random
 from db import models
 import hashlib
 import os
+from db.models import Queue
 from services.schemas.bus import bus_request
 from services.schemas.card import card_request
 from services.schemas.company import company_request
@@ -827,6 +828,10 @@ async def get_places(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.Place).offset(skip).limit(limit).all()
 
 
+async def get_active_places(db: Session, skip: int = 0, limit: int = 100):
+    return list(db.query(models.Place).filter(models.Place.status == 'active').offset(skip).limit(limit).all())
+
+
 async def get_place_by_name(db: Session, name: str):
     return db.query(models.Place).filter(models.Place.name == name).first()
 
@@ -919,3 +924,21 @@ async def de_occupy_place_in_queue(db: Session, place: queue_response.ReturnQueu
     db.add(place)
     db.commit()
     return 'successfully un-occupied place in queue'
+
+
+async def delete_expired_queues(db: Session):
+    db_queues = (db.query(models.Queue)
+            .filter(
+        models.Queue.date == date.today())
+            .all())
+    for record in db_queues:
+        db.delete(record)
+    db.commit()
+
+
+async def add_new_queue_day(db: Session):
+    db.add_all([
+        Queue(status="free", date=(date.today() + timedelta(days=3)), time=time(hour=(i // 15), minute=(i % 15))) for i
+        in range(36, 85)
+    ])
+    db.commit()
