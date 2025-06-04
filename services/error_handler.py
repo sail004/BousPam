@@ -1,11 +1,15 @@
 import logging
 import httpx
 import os
+from dotenv import load_dotenv
+
+
+load_dotenv()
 
 # Конфигурация Telegram бота (лучше вынести в переменные окружения)
 
-TELEGRAM_BOT_TOKEN = os.environ['TELEGRAM_BOT_TOKEN']
-TELEGRAM_CHAT_ID = os.environ['TELEGRAM_CHAT_ID']
+TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
+TELEGRAM_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
 
 
 async def send_telegram_notification(error_details: str):
