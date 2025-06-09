@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from services import crud_utils, luhn
 from services.schemas.operations import operations_request, operations_response
 from db.database import SessionLocal
+from services.api_key_verification import verify_api_key
 
 
 def get_db():
@@ -56,30 +57,31 @@ async def read_operations_by_user_id(user_id: int, db: Session = Depends(get_db)
     response_model=operations_response.ReturnBalance,
     description="Operation for payment by user's card number, providing by terminal"
 )
-async def payment_by_card_number(operation: operations_request.OperationPaymentCreate, db: Session = Depends(get_db)):
-    db_card = await crud_utils.get_card_by_number(db, card_number=operation.card_number)
-    db_terminal = await crud_utils.get_terminal_by_id(db, terminal_id=operation.id_terminal)
-    if db_terminal is None:
-        raise HTTPException(status_code=404, detail=f"Terminal with id=\'{operation.id_terminal}\' not found")
-    if db_card is None:
-        raise HTTPException(status_code=404, detail=f"Card with number=\'{operation.card_number}\' not found")
-    if db_terminal.hash != operation.terminal_hash:
-        raise HTTPException(status_code=404, detail=f"Incorrect terminal hash")
-    db_user = await crud_utils.get_user_by_id(db, db_card.owner_id)
-    delta_time = datetime.now() - operation.request_time.replace(tzinfo=None)
-    #crud_utils.create_operation_payment(db, operation, 'payment')
-    balance_change = await crud_utils.get_price_by_terminal_id(db, operation.id_terminal)
-    if delta_time < timedelta(minutes=1):
-        if db_user.balance < abs(balance_change):
-            raise HTTPException(status_code=400, detail=f"Insufficient funds to make the payment")
-    new_balance = await crud_utils.create_operation_payment(db, operation, 'payment', db_card.owner_id)
-    if new_balance < 0:
-        await crud_utils.add_to_stoplist(db, operations_request.StopListCreate(
-            card_number=operation.card_number,
-            owner_id=db_user.id,
-            owner_phone_number=db_user.phone_number
-        ))
-    return new_balance
+async def payment_by_card_number(operation: operations_request.OperationPaymentCreate, api_key: str = Depends(verify_api_key), db: Session = Depends(get_db)):
+    if api_key:
+        db_card = await crud_utils.get_card_by_number(db, card_number=operation.card_number)
+        db_terminal = await crud_utils.get_terminal_by_id(db, terminal_id=operation.id_terminal)
+        if db_terminal is None:
+            raise HTTPException(status_code=404, detail=f"Terminal with id=\'{operation.id_terminal}\' not found")
+        if db_card is None:
+            raise HTTPException(status_code=404, detail=f"Card with number=\'{operation.card_number}\' not found")
+        if db_terminal.hash != operation.terminal_hash:
+            raise HTTPException(status_code=404, detail=f"Incorrect terminal hash")
+        db_user = await crud_utils.get_user_by_id(db, db_card.owner_id)
+        delta_time = datetime.now() - operation.request_time.replace(tzinfo=None)
+        #crud_utils.create_operation_payment(db, operation, 'payment')
+        balance_change = await crud_utils.get_price_by_terminal_id(db, operation.id_terminal)
+        if delta_time < timedelta(minutes=1):
+            if db_user.balance < abs(balance_change):
+                raise HTTPException(status_code=400, detail=f"Insufficient funds to make the payment")
+        new_balance = await crud_utils.create_operation_payment(db, operation, 'payment', db_card.owner_id)
+        if new_balance < 0:
+            await crud_utils.add_to_stoplist(db, operations_request.StopListCreate(
+                card_number=operation.card_number,
+                owner_id=db_user.id,
+                owner_phone_number=db_user.phone_number
+            ))
+        return new_balance
 
 
 @operations_router.put(

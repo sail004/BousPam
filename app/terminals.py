@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from services import crud_utils
 from services.schemas.terminal import terminal_request, terminal_response
 from db.database import SessionLocal
+from services.api_key_verification import verify_api_key
 
 
 def get_db():
@@ -95,7 +96,8 @@ async def delete_terminal_by_id(terminal_id: int, db: Session = Depends(get_db))
     response_model=list,
     description="Operation for getting stoplist"
 )
-async def read_stoplist(db: Session = Depends(get_db)):
-    stoplist = await crud_utils.get_stoplist(db)
-    re = [card.card_number for card in stoplist]
-    return re
+async def read_stoplist(api_key: str = Depends(verify_api_key), db: Session = Depends(get_db)):
+    if api_key:
+        stoplist = await crud_utils.get_stoplist(db)
+        re = [card.card_number for card in stoplist]
+        return re
