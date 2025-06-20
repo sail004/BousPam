@@ -18,7 +18,7 @@ from db.models import *
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
-config.set_main_option("sqlalchemy.url", "postgresql://postgres:pass@localhost/postgres")
+config.set_main_option("sqlalchemy.url", "postgresql://postgres:pass@db/postgres")
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
 if config.config_file_name is not None:
@@ -36,7 +36,7 @@ target_metadata = Base.metadata
 # ... etc.
 
 # Создаём синхронное подключение
-engine = create_engine("postgresql://postgres:pass@localhost/postgres")
+engine = create_engine("postgresql://postgres:pass@db/postgres")
 
 
 def run_migrations_online():
