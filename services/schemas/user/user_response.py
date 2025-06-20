@@ -11,7 +11,7 @@ class ReturnId(BaseModel):
 
 
 class ReturnUser(User):
-    cards: list[str]
+    cards: list[str] | None = None
     tg_id: int | None = None
 
 
