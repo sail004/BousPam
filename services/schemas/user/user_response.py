@@ -12,7 +12,7 @@ class ReturnId(BaseModel):
 
 class ReturnUser(User):
     cards: list[str]
-    tg_id: int
+    tg_id: int | None = None
 
 
 class ReturnBalance(BaseModel):
