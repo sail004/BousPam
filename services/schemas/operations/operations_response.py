@@ -12,6 +12,7 @@ class ReturnOperation(Operation):
     cashier_id: int | None = None
     cashbox_number: int | None = None
     balance_change: float | None = None
+    card_number: str | None = None
 
 
 class ReturnBalance(BaseModel):

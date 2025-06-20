@@ -26,6 +26,7 @@ class Operation(Base):
     terminal_hash = Column(String)
     id_user = Column(Integer)
     type = Column(String)
+    card_number = Column(String)
     balance_change = Column(Float)
     datetime = Column(DateTime)
     cashier_id = Column(Integer)
