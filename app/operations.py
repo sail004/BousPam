@@ -101,7 +101,7 @@ async def replenishment_by_card_number(operation: operations_request.OperationRe
     new_balance = await crud_utils.create_operation_replenishment(db, operation, 'replenishment', db_card.owner_id)
     if new_balance > 0:
         await crud_utils.delete_from_stoplist(db, operation.card_number)
-    return new_balance
+    return operations_response.ReturnBalance(balance=new_balance)
 
 
 @operations_router.put(
