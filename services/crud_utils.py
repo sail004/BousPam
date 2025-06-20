@@ -181,7 +181,7 @@ async def create_terminal(db: Session, terminal: terminal_request.TerminalCreate
     random_string = ''.join(random.choices(string.ascii_letters + string.digits, k=8))
     hash = hashlib.pbkdf2_hmac('sha256', random_string.encode('utf-8'), os.urandom(32), 100000, dklen=128)
     db_term = models.Terminal(
-        company=terminal.company_name,
+        company=terminal.company,
         fare=terminal.fare,
         hash=hash.hex()
     )

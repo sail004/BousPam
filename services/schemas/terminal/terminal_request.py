@@ -5,7 +5,7 @@ from datetime import datetime
 
 
 class TerminalBase(BaseModel):
-    company_name: str
+    company: str
     fare: int
 
 

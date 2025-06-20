@@ -23,9 +23,9 @@ terminal_router = APIRouter(prefix='/terminals', tags=['Interaction with termina
     description="Operation for creating terminal"
 )
 async def create_terminal(terminal: terminal_request.TerminalCreate, db: Session = Depends(get_db)):
-    db_tc = await crud_utils.get_transport_company_by_name(db, tc_name=terminal.company_name)
+    db_tc = await crud_utils.get_transport_company_by_name(db, tc_name=terminal.company)
     if db_tc is None:
-        raise HTTPException(status_code=404, detail=f"Transport company with name=\'{terminal.company_name}\' not found")
+        raise HTTPException(status_code=404, detail=f"Transport company with name=\'{terminal.company}\' not found")
     return await crud_utils.create_terminal(db=db, terminal=terminal)
 
 
@@ -56,10 +56,10 @@ async def read_terminals(skip: int = 0, limit: int = 100, db: Session = Depends(
     response_model=list[terminal_response.ReturnTerminal],
     description="Operation for getting list of terminals owned by a company, by the name of that company"
 )
-async def read_terminals_by_company_name(company_name: str, db: Session = Depends(get_db)):
-    db_term = await crud_utils.get_terminals_by_company(db, company_name=company_name)
+async def read_terminals_by_company_name(company: str, db: Session = Depends(get_db)):
+    db_term = await crud_utils.get_terminals_by_company(db, company_name=company)
     if db_term is None:
-        raise HTTPException(status_code=404, detail=f"Transport company with name=\'{company_name}\' not found")
+        raise HTTPException(status_code=404, detail=f"Transport company with name=\'{company}\' not found")
     return db_term
 
 
