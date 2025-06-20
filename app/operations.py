@@ -81,7 +81,7 @@ async def payment_by_card_number(operation: operations_request.OperationPaymentC
                 owner_id=db_user.id,
                 owner_phone_number=db_user.phone_number
             ))
-        return new_balance
+        return operations_response.ReturnBalance(balance=new_balance)
 
 
 @operations_router.put(
