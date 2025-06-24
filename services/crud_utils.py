@@ -24,7 +24,8 @@ from services.schemas.place import place_request
 from services.schemas.queue import queue_request, queue_response
 from services.settings import get_auth_data
 from services.luhn import set_luhn
-from jose import jwt, JWTError
+#from jose import jwt, JWTError
+import jwt
 from db.database import SessionLocal
 from fastapi import Request, HTTPException, status, Depends
 
@@ -804,7 +805,7 @@ async def get_current_user(db: Session = Depends(get_db), token: str = Depends(g
     try:
         auth_data = get_auth_data()
         payload = jwt.decode(token, auth_data['secret_key'], algorithms=[auth_data['algorithm']])
-    except JWTError:
+    except Exception as e:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Invalid token')
 
     expire = payload.get('exp')
