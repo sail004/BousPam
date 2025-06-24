@@ -1,13 +1,10 @@
 import os
 from dotenv import load_dotenv
-from cryptography.hazmat.primitives.serialization import load_pem_private_key
+from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 
 load_dotenv()
-pem_bytes = os.getenv('SECRET_KEY_PEM')
-pem = f"""-----BEGIN PRIVATE KEY-----
-{pem_bytes}
------END PRIVATE KEY-----"""
-SECRET_KEY = load_pem_private_key(pem.encode('utf-8'), password=None)
+
+SECRET_KEY = Ed25519PrivateKey.generate()
 ALGORITHM = os.getenv('ALGORITHM')
 API_KEY = os.getenv('API_KEY')
 
