@@ -22,7 +22,7 @@ from services.schemas.tg import tg_request
 from services.schemas.user import user_request
 from services.schemas.place import place_request
 from services.schemas.queue import queue_request, queue_response
-from services.settings import get_auth_data
+from services.settings import get_auth_data, get_lago_key, get_lago_url
 from services.luhn import set_luhn
 #from jose import jwt, JWTError
 import jwt
@@ -38,8 +38,8 @@ def get_db():
         db.close()
 
 
-LAGO_URL="http://localhost:3000"
-API_KEY="d9ac4289-124c-4108-8327-13df555f96de"
+LAGO_URL=get_lago_url()
+API_KEY=get_lago_key()
 
 
 async def get_user_by_id(db: Session, user_id: int):
@@ -80,7 +80,66 @@ async def create_user(db: Session, user: user_request.UserCreate):
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
+    await lago_create_user(user, db_user.id)
     return db_user.id
+
+
+async def lago_create_user(user: user_request.UserCreate, user_id: int):
+    url = LAGO_URL + "/api/v1/customers"
+    headers = {"Authorization": "Bearer " + API_KEY, 'Content-Type': 'application/json'}
+    data = {
+    "customer": {
+        "external_id": str(user_id),
+        "address_line1": "",
+        "address_line2": "",
+        "city": "Port-au-Prince",
+        "country": "HT",
+        "currency": "HTG",
+        "email": user.e_mail,
+        "legal_name": user.name,
+        "legal_number": "",
+        "tax_identification_number": "",
+        "logo_url": "",
+        "name": user.name + ' ' + user.surname,
+        "phone": user.phone_number,
+        "state": "",
+        "timezone": "America/Port-au-Prince",
+        "url": "",
+        "zipcode": "",
+        "tax_codes": [],
+        "billing_configuration": {
+            "invoice_grace_period": 3,
+            "payment_provider": "",
+            "provider_customer_id": "",
+            "sync": "false",
+            "sync_with_provider": "false",
+            "document_locale": "fr",
+        },
+        "metadata": [
+            {
+             "key": "Name",
+             "value": user.name + ' ' + user.surname,
+             "display_in_invoice": "true"
+            },
+            {
+                "key": "NIU",
+                "value": user.niu,
+                "display_in_invoice": "false"
+            },
+            {
+                "key": "NIF",
+                "value": user.nif,
+                "display_in_invoice": "false"
+            },
+            {
+                "key": "passport_number",
+                "value": user.passport_number,
+                "display_in_invoice": "false"
+            }
+      ]
+    }
+    }
+    requests.post(url=url, headers=headers, json=data)
 
 
 async def get_price_by_terminal_id(db: Session, terminal_id: int):
